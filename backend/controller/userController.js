@@ -54,6 +54,47 @@ export const registerUser = catchAsyncErros(async (req, res, next) => {
   });
 });
 
+export const login = catchAsyncErros(async (req, res, next) => {
+  const { email, password, confirmPassword, role } = req.body;
+
+  if (!email || !password || !confirmPassword || !role) {
+    return next(new ErrorHandler("Please fill all the required fields", 400));
+  }
+
+  const user = await User.findOne({ email }).select("+password");
+
+  if (!user) {
+    return next(new ErrorHandler("Invalid email or password", 401));
+  }
+
+  const isPasswordMatched = await user.comparePassword(password);
+
+  if (!isPasswordMatched) {
+    return next(new ErrorHandler("Invalid email or password", 401));
+  }
+
+  if (password !== confirmPassword) {
+    return next(
+      new ErrorHandler("Password and Confirm Password do not match", 400),
+    );
+  }
+
+  if (user.role !== role) {
+    return next(
+      new ErrorHandler("Role does not match with registered user", 400),
+    );
+  }
+
+  // const token = user.generateJsonWebToken();
+
+  return res.status(200).json({
+    success: true,
+    message: "Login Successful",
+    // token,
+    user,
+  });
+});
+
 export const getUsers = catchAsyncErros(async (req, res, next) => {
   const users = await User.find({});
   return res.status(200).json({
