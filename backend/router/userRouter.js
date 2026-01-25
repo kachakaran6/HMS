@@ -7,6 +7,7 @@ import {
   getDoctors,
   logoutAdmin,
   logoutUser,
+  addNewDoctor,
 } from "../controller/userController.js";
 import {
   isAdminAuthenticated,
@@ -24,6 +25,7 @@ router.get("/patient/me", isPatientAuthenticated, getUsers);
 router.post("/login", login);
 
 router.post("/admin/addnew", isAdminAuthenticated, addNewAdmin);
+router.post("/doctor/addnew", isAdminAuthenticated, addNewDoctor);
 
 router.post("/adminLogout", logoutAdmin);
 router.post("/userLogout", logoutUser);
