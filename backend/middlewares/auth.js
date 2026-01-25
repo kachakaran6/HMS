@@ -29,10 +29,15 @@ export const isPatientAuthenticated = catchAsyncErros(
     }
     const decoded = jwt.verify(token, process.env.JWT_SECRET_KEY);
     req.user = await User.findById(decoded.id);
-    if (req.user.role !== "user") {
+    if (
+      req.user.role !== "user" &&
+      req.user.role !== "patient" &&
+      req.user.role !== "doctor" &&
+      req.user.role !== "staff"
+    ) {
       return next(
         new ErrorHandler(
-          "Access denied, not a patient, pehli fursat me nikal yaha se",
+          `Access denied ${req.user.role}, not a patient, pehli fursat me nikal yaha se`,
           403,
         ),
       );

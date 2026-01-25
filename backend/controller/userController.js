@@ -135,3 +135,44 @@ export const getUsers = catchAsyncErros(async (req, res, next) => {
     users,
   });
 });
+
+export const getDoctors = catchAsyncErros(async (req, res, next) => {
+  const users = await User.find({ role: "doctor" });
+  return res.status(200).json({
+    success: true,
+    users,
+  });
+});
+
+export const getUserDetails = catchAsyncErros(async (req, res, next) => {
+  const user = req.user;
+  res.status(200).json({
+    success: true,
+    user,
+  });
+});
+
+export const logoutAdmin = catchAsyncErros(async (req, res, next) => {
+  res
+    .status(200)
+    .cookie("admin_token", null, {
+      expires: new Date(Date.now()),
+      httpOnly: true,
+    })
+    .json({
+      success: true,
+      message: "Admin Logged Out Successfully",
+    });
+});
+export const logoutUser = catchAsyncErros(async (req, res, next) => {
+  res
+    .status(200)
+    .cookie("user_token", null, {
+      expires: new Date(Date.now()),
+      httpOnly: true,
+    })
+    .json({
+      success: true,
+      message: "User Logged Out Successfully",
+    });
+});
