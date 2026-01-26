@@ -18,7 +18,7 @@ const router = express.Router();
 
 router.post("/register", registerUser);
 router.get("/all", getUsers);
-router.get("/allDoc", isAdminAuthenticated, getDoctors);
+router.get("/allDoc", getDoctors);
 
 router.get("/admin/me", isAdminAuthenticated, getUsers);
 router.get("/patient/me", isPatientAuthenticated, getUsers);

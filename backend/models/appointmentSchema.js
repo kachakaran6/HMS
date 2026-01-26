@@ -50,11 +50,9 @@ const appointmentSchema = new mongoose.Schema(
     doctor: {
       firstname: {
         type: String,
-        required: true,
       },
       lastName: {
         type: String,
-        required: true,
       },
     },
     has_visited: {

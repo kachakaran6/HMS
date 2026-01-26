@@ -9,7 +9,6 @@ export const bookAppointment = catchAsyncErros(async (req, res, next) => {
     lastName,
     email,
     phone,
-    nic,
     dob,
     gender,
     appointment_date,
@@ -19,12 +18,12 @@ export const bookAppointment = catchAsyncErros(async (req, res, next) => {
     hasVisited,
     address,
   } = req.body;
+
   if (
     !firstName ||
     !lastName ||
     !email ||
     !phone ||
-    !nic ||
     !dob ||
     !gender ||
     !appointment_date ||
@@ -35,49 +34,45 @@ export const bookAppointment = catchAsyncErros(async (req, res, next) => {
   ) {
     return next(new ErrorHandler("Please Fill Full Form!", 400));
   }
-  const isConflict = await User.find({
+
+  if (!req.user) {
+    return next(new ErrorHandler("Unauthorized", 401));
+  }
+
+  const doctor = await User.findOne({
     firstName: doctor_firstName,
     lastName: doctor_lastName,
-    role: "Doctor",
+    role: "doctor",
     doctorDepartment: department,
   });
-  if (isConflict.length === 0) {
+
+  if (!doctor) {
     return next(new ErrorHandler("Doctor not found", 404));
   }
 
-  if (isConflict.length > 1) {
-    return next(
-      new ErrorHandler(
-        "Doctors Conflict! Please Contact Through Email Or Phone!",
-        400,
-      ),
-    );
-  }
-  const doctorId = isConflict[0]._id;
-  const patientId = req.user._id;
   const appointment = await Appointment.create({
     firstName,
     lastName,
     email,
     phone,
-    nic,
     dob,
     gender,
     appointment_date,
     department,
     doctor: {
-      firstName: doctor_firstName,
+      firstName: doctor_firstName, // must match schema
       lastName: doctor_lastName,
     },
     hasVisited,
     address,
-    doctorId,
-    patientId,
+    patientId: req.user._id, // ✅ ObjectId
+    doctorId: doctor._id,
   });
-  res.status(200).json({
+
+  res.status(201).json({
     success: true,
+    message: "Appointment booked successfully",
     appointment,
-    message: "Appointment Send!",
   });
 });
 
