@@ -50,7 +50,8 @@ const Login = () => {
   return (
     <>
       <div className="container form-component">
-        <img src="/logo.png" alt="" className="logo" />
+        {/* <img src="/logo.png" alt="" className="logo" /> */}
+        <span>Logo</span>
         <h1 className="form-title">Welcome to A Care</h1>
         <p>Only admin are allowed to access this</p>
         <form onSubmit={handleLogin}>
