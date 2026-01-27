@@ -1,13 +1,49 @@
 <!doctype html>
 <html lang="en">
   <head>
+    <!-- 🔹 Basic -->
     <meta charset="UTF-8" />
-    <link rel="icon" type="image/svg+xml" href="/vite.svg" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>dashboard</title>
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+
+    <!-- 🔹 Title -->
+    <title>HMS Dashboard | Hospital Management System</title>
+
+    <!-- 🔹 Favicon -->
+    <link rel="icon" type="image/png" href="/favicon.png" />
+
+    <!-- 🔹 SEO -->
+    <meta
+      name="description"
+      content="Hospital Management System Dashboard to manage doctors, patients, appointments, and messages."
+    />
+    <meta
+      name="keywords"
+      content="Hospital Management System, HMS, Dashboard, Doctors, Patients, Appointments"
+    />
+    <meta name="author" content="HMS Team" />
+
+    <!-- 🔹 Theme (mobile browser color) -->
+    <meta name="theme-color" content="#3939d9" />
+
+    <!-- 🔹 Fonts (optional, since you already use Montserrat in CSS) -->
+    <link
+      href="https://fonts.googleapis.com/css2?family=Montserrat:wght@100..900&display=swap"
+      rel="stylesheet"
+    />
+
+    <!-- 🔹 Prevent favicon 404 on refresh -->
+    <link rel="apple-touch-icon" href="/favicon.png" />
   </head>
+
   <body>
+    <noscript>
+      <strong> This dashboard requires JavaScript to run properly. </strong>
+    </noscript>
+
     <div id="root"></div>
+
+    <!-- 🔹 Vite entry -->
     <script type="module" src="/src/main.jsx"></script>
   </body>
 </html>
