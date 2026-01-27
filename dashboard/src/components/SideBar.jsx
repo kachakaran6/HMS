@@ -59,20 +59,23 @@ const SideBar = () => {
       <aside
         className={`
     fixed lg:static top-0 left-0 z-50
-    h-screen w-64 bg-white border-r border-slate-200
+    h-[100svh] w-64 bg-white border-r border-slate-200
     transform transition-transform
     ${open ? "translate-x-0" : "-translate-x-full"}
     lg:translate-x-0
-    flex flex-col
+    relative
   `}
       >
-        {/* TOP (logo) */}
-        <div className="p-4 border-b">
+        {/* LOGO */}
+        <div className="px-4 py-4 border-b">
           <h2 className="text-xl font-bold text-slate-900">HMS Admin</h2>
         </div>
 
-        {/* MIDDLE (scrollable nav) */}
-        <nav className="flex-1 overflow-y-auto p-4 space-y-2">
+        {/* NAV (SCROLL AREA) */}
+        <nav
+          className="px-4 py-4 space-y-2 overflow-y-auto"
+          style={{ height: "calc(100svh - 140px)" }}
+        >
           <NavLink
             to="/"
             end
@@ -135,8 +138,8 @@ const SideBar = () => {
           </NavLink>
         </nav>
 
-        {/* BOTTOM (ALWAYS VISIBLE LOGOUT) */}
-        <div className="p-4 border-t">
+        {/* 🔴 LOGOUT — HARD PINNED */}
+        <div className="absolute bottom-0 left-0 w-full p-4 border-t bg-white">
           <button
             onClick={handleLogout}
             className="w-full flex items-center gap-3 px-4 py-3 rounded-xl text-red-600 hover:bg-red-50 transition"
