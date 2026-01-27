@@ -1,6 +1,9 @@
-import { useContext, useState } from "react";
+import { useContext } from "react";
 import { NavLink, useNavigate } from "react-router-dom";
 import { Context } from "../main";
+import axios from "axios";
+import { toast } from "react-toastify";
+
 import { AiFillMessage } from "react-icons/ai";
 import { RiLogoutBoxFill } from "react-icons/ri";
 import { TiHome } from "react-icons/ti";
@@ -8,13 +11,8 @@ import { FaUserMd, FaCalendarCheck } from "react-icons/fa";
 import { MdAddModerator } from "react-icons/md";
 import { IoPersonAddSharp } from "react-icons/io5";
 
-import { GiHamburgerMenu } from "react-icons/gi";
-import axios from "axios";
-import { toast } from "react-toastify";
-
-const SideBar = () => {
+const SideBar = ({ onLinkClick }) => {
   const { setIsAuthenticated } = useContext(Context);
-  const [open, setOpen] = useState(false);
   const navigate = useNavigate();
   const baseURL = import.meta.env.VITE_API_BASE_URL;
 
@@ -39,116 +37,90 @@ const SideBar = () => {
   const activeClass = "bg-blue-600 text-white hover:bg-blue-600";
 
   return (
-    <>
-      {/* Mobile toggle */}
-      <button
-        className="lg:hidden fixed top-4 left-4 z-50 p-2 rounded-lg bg-white shadow"
-        onClick={() => setOpen(true)}
-      >
-        <GiHamburgerMenu />
-      </button>
+    <aside className="h-[100svh] w-64 bg-white border-r border-slate-200 flex flex-col">
+      {/* Logo */}
+      <div className="p-4 border-b">
+        <h2 className="text-xl font-bold text-slate-900">HMS Admin</h2>
+      </div>
 
-      {/* Overlay (mobile) */}
-      {open && (
-        <div
-          className="fixed inset-0 bg-black/30 z-40 lg:hidden"
-          onClick={() => setOpen(false)}
-        />
-      )}
-
-      <aside
-        className={`
-    fixed lg:static top-0 left-0 z-50
-    h-[100svh] w-64 bg-white border-r border-slate-200
-    transform transition-transform
-    ${open ? "translate-x-0" : "-translate-x-full"}
-    lg:translate-x-0
-    relative
-  `}
-      >
-        {/* LOGO */}
-        <div className="px-4 py-4 border-b">
-          <h2 className="text-xl font-bold text-slate-900">HMS Admin</h2>
-        </div>
-
-        {/* NAV (SCROLL AREA) */}
-        <nav
-          className="px-4 py-4 space-y-2 overflow-y-auto"
-          style={{ height: "calc(100svh - 140px)" }}
+      {/* Nav */}
+      <nav className="flex-1 overflow-y-auto p-4 space-y-2">
+        <NavLink
+          to="/"
+          end
+          className={({ isActive }) =>
+            `${linkClass} ${isActive ? activeClass : ""}`
+          }
+          onClick={() => {
+            onLinkClick();
+          }}
         >
-          <NavLink
-            to="/"
-            end
-            className={({ isActive }) =>
-              `${linkClass} ${isActive ? activeClass : ""}`
-            }
-            onClick={() => setOpen(false)}
-          >
-            <TiHome /> Dashboard
-          </NavLink>
+          <TiHome /> Dashboard
+        </NavLink>
 
-          <NavLink
-            to="/doctors"
-            className={({ isActive }) =>
-              `${linkClass} ${isActive ? activeClass : ""}`
-            }
-            onClick={() => setOpen(false)}
-          >
-            <FaUserMd /> Doctors
-          </NavLink>
+        <NavLink
+          to="/doctors"
+          className={({ isActive }) =>
+            `${linkClass} ${isActive ? activeClass : ""}`
+          }
+          onClick={() => {
+            onLinkClick();
+          }}
+        >
+          <FaUserMd /> Doctors
+        </NavLink>
 
-          <NavLink
-            to="/appointments"
-            className={({ isActive }) =>
-              `${linkClass} ${isActive ? activeClass : ""}`
-            }
-            onClick={() => setOpen(false)}
-          >
-            <FaCalendarCheck /> Appointments
-          </NavLink>
+        <NavLink
+          to="/appointments"
+          className={({ isActive }) =>
+            `${linkClass} ${isActive ? activeClass : ""}`
+          }
+          onClick={onLinkClick}
+        >
+          <FaCalendarCheck /> Appointments
+        </NavLink>
 
-          <NavLink
-            to="/admin/addnew"
-            className={({ isActive }) =>
-              `${linkClass} ${isActive ? activeClass : ""}`
-            }
-            onClick={() => setOpen(false)}
-          >
-            <MdAddModerator /> Add Admin
-          </NavLink>
+        <NavLink
+          to="/admin/addnew"
+          className={({ isActive }) =>
+            `${linkClass} ${isActive ? activeClass : ""}`
+          }
+          onClick={onLinkClick}
+        >
+          <MdAddModerator /> Add Admin
+        </NavLink>
 
-          <NavLink
-            to="/doctor/addnew"
-            className={({ isActive }) =>
-              `${linkClass} ${isActive ? activeClass : ""}`
-            }
-            onClick={() => setOpen(false)}
-          >
-            <IoPersonAddSharp /> Add Doctor
-          </NavLink>
+        <NavLink
+          to="/doctor/addnew"
+          className={({ isActive }) =>
+            `${linkClass} ${isActive ? activeClass : ""}`
+          }
+          onClick={onLinkClick}
+        >
+          <IoPersonAddSharp /> Add Doctor
+        </NavLink>
 
-          <NavLink
-            to="/messages"
-            className={({ isActive }) =>
-              `${linkClass} ${isActive ? activeClass : ""}`
-            }
-            onClick={() => setOpen(false)}
-          >
-            <AiFillMessage /> Messages
-          </NavLink>
-        </nav>
+        <NavLink
+          to="/messages"
+          className={({ isActive }) =>
+            `${linkClass} ${isActive ? activeClass : ""}`
+          }
+          onClick={onLinkClick}
+        >
+          <AiFillMessage /> Messages
+        </NavLink>
+      </nav>
 
-        {/* 🔴 LOGOUT — HARD PINNED */}
-        <div className="absolute bottom-0 left-0 w-full p-4 border-t bg-white">
-          <button
-            onClick={handleLogout}
-            className="w-full flex items-center gap-3 px-4 py-3 rounded-xl text-red-600 hover:bg-red-50 transition"
-          >
-            <RiLogoutBoxFill /> Logout
-          </button>
-        </div>
-      </aside>
-    </>
+      {/* Logout */}
+      <div className="p-4 border-t">
+        <button
+          onClick={handleLogout}
+          className="w-full flex items-center gap-3 px-4 py-3 rounded-xl text-red-600 hover:bg-red-50 transition"
+        >
+          <RiLogoutBoxFill /> Logout
+        </button>
+      </div>
+    </aside>
   );
 };
 
