@@ -1,4 +1,5 @@
-import React from "react";
+/* eslint-disable no-unused-vars */
+import React, { useContext, useEffect } from "react";
 import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
 import Dashboard from "./components/Dashboard";
 import Login from "./components/Login";
@@ -9,8 +10,29 @@ import Doctor from "./components/Doctor";
 import SideBar from "./components/SideBar";
 import { ToastContainer } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
+import { Context } from "./main";
+import axios from "axios";
+import "./App.css";
 
 const App = () => {
+  const { isAuthenticated, setIsAuthenticated, setUser } = useContext(Context);
+  useEffect(() => {
+    const fetchUser = async () => {
+      const baseURL = import.meta.env.VITE_API_BASE_URL;
+      try {
+        // http://localhost:3000/api/v1/user/patient/me
+        const res = await axios.get(`${baseURL}/api/v1/user/admin/me`, {
+          withCredentials: true,
+        });
+        setIsAuthenticated(true);
+        setUser(res.data.user);
+      } catch (error) {
+        setIsAuthenticated(false);
+        setUser({});
+      }
+    };
+    fetchUser();
+  }, [isAuthenticated]);
   return (
     <>
       <Router>
