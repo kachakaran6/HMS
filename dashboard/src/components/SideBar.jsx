@@ -51,9 +51,7 @@ const SideBar = ({ onLinkClick }) => {
           className={({ isActive }) =>
             `${linkClass} ${isActive ? activeClass : ""}`
           }
-          onClick={() => {
-            onLinkClick();
-          }}
+          onClick={onLinkClick}
         >
           <TiHome /> Dashboard
         </NavLink>
@@ -63,9 +61,7 @@ const SideBar = ({ onLinkClick }) => {
           className={({ isActive }) =>
             `${linkClass} ${isActive ? activeClass : ""}`
           }
-          onClick={() => {
-            onLinkClick();
-          }}
+          onClick={onLinkClick}
         >
           <FaUserMd /> Doctors
         </NavLink>

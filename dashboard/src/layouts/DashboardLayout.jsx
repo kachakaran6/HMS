@@ -1,36 +1,47 @@
+import { useState } from "react";
 import SideBar from "../components/SideBar";
 import DashboardHeader from "./DashboardHeader";
 import { Outlet } from "react-router-dom";
-import { useState } from "react";
 
 const DashboardLayout = () => {
-  const [open, setOpen] = useState(false);
+  const [sidebarOpen, setSidebarOpen] = useState(false);
 
   return (
     <div className="min-h-[100svh] bg-slate-100 grid grid-cols-1 lg:grid-cols-[256px_1fr]">
-      {/* Sidebar (desktop) */}
+      {/* Desktop Sidebar */}
       <aside className="hidden lg:block bg-white border-r">
         <SideBar />
       </aside>
 
       {/* Mobile Sidebar Drawer */}
-      {open && (
-        <div className="fixed inset-0 z-50 lg:hidden">
-          <div
-            className="absolute inset-0 bg-black/40"
-            onClick={() => setOpen(false)}
-          />
-          <div className="absolute left-0 top-0 h-full w-64 bg-white shadow-xl">
-            <SideBar onClose={() => setOpen(false)} />
-          </div>
+      <div
+        className={`
+          fixed inset-0 z-50 lg:hidden
+          transition-opacity duration-300
+          ${sidebarOpen ? "opacity-100 pointer-events-auto" : "opacity-0 pointer-events-none"}
+        `}
+      >
+        {/* Overlay */}
+        <div
+          className="absolute inset-0 bg-black/40"
+          onClick={() => setSidebarOpen(false)}
+        />
+
+        {/* Drawer */}
+        <div
+          className={`
+            absolute left-0 top-0 h-full w-64 bg-white shadow-xl
+            transform transition-transform duration-300
+            ${sidebarOpen ? "translate-x-0" : "-translate-x-full"}
+          `}
+        >
+          <SideBar onLinkClick={() => setSidebarOpen(false)} />
         </div>
-      )}
+      </div>
 
       {/* Content */}
       <div className="flex flex-col">
-        {/* Header (mobile only) */}
-        <DashboardHeader onMenuClick={() => setOpen(true)} />
-
+        <DashboardHeader onMenuClick={() => setSidebarOpen(true)} />
         <main className="p-6 overflow-x-hidden">
           <Outlet />
         </main>
