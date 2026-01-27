@@ -155,25 +155,38 @@ export const getUserDetails = catchAsyncErros(async (req, res, next) => {
 export const logoutAdmin = catchAsyncErros(async (req, res, next) => {
   res
     .status(200)
-    .cookie("admin_token", null, {
-      expires: new Date(Date.now()),
+    .cookie("admin_token", "", {
       httpOnly: true,
+      secure: true, // ✅ REQUIRED
+      sameSite: "None", // ✅ REQUIRED
+      expires: new Date(0),
     })
     .json({
       success: true,
       message: "Admin Logged Out Successfully",
     });
 });
+
 export const logoutUser = catchAsyncErros(async (req, res, next) => {
   res
     .status(200)
-    .cookie("user_token", null, {
-      expires: new Date(Date.now()),
+    // remove user cookie
+    .cookie("user_token", "", {
       httpOnly: true,
+      secure: true,
+      sameSite: "None",
+      expires: new Date(0),
+    })
+    // remove admin cookie
+    .cookie("admin_token", "", {
+      httpOnly: true,
+      secure: true,
+      sameSite: "None",
+      expires: new Date(0),
     })
     .json({
       success: true,
-      message: "User Logged Out Successfully",
+      message: "Logged out successfully",
     });
 });
 
