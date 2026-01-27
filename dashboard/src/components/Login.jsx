@@ -1,5 +1,4 @@
-import React from "react";
-import { useState, useContext, useEffect } from "react";
+import React, { useState, useContext, useEffect } from "react";
 import { Context } from "../main";
 import { toast } from "react-toastify";
 import axios from "axios";
@@ -13,15 +12,19 @@ const Login = () => {
   const [confirmPassword, setConfirmPassword] = useState("");
 
   const baseURL = import.meta.env.VITE_API_BASE_URL;
-
   const navigateTo = useNavigate();
 
   const handleLogin = async (e) => {
     e.preventDefault();
 
+    // frontend guard
+    if (password !== confirmPassword) {
+      toast.error("Password and Confirm Password must match");
+      return;
+    }
+
     try {
-      // http://localhost:3000/api/v1/user/login
-      const response = await axios.post(
+      const { data } = await axios.post(
         `${baseURL}/api/v1/user/login`,
         {
           email,
@@ -34,54 +37,75 @@ const Login = () => {
           headers: { "Content-Type": "application/json" },
         },
       );
-      toast.success(response.data.message);
+
+      toast.success(data.message);
       setIsAuthenticated(true);
       navigateTo("/");
     } catch (error) {
-      toast.error(error.response.data.message);
+      toast.error(error.response.data.message || "Login failed");
     }
   };
 
   useEffect(() => {
-    if (isAuthenticated) {
-      navigateTo("/");
-    }
+    if (isAuthenticated) navigateTo("/");
   }, [isAuthenticated, navigateTo]);
+
   return (
-    <>
-      <div className="container form-component">
-        {/* <img src="/logo.png" alt="" className="logo" /> */}
-        <span>Logo</span>
-        <h1 className="form-title">Welcome to A Care</h1>
-        <p>Only admin are allowed to access this</p>
-        <form onSubmit={handleLogin}>
+    <section className="min-h-[100svh] flex items-center justify-center bg-slate-100 px-6">
+      <div className="w-full max-w-md bg-white rounded-2xl shadow-xl border border-slate-200 p-8">
+        {/* Logo / Brand */}
+        <div className="flex items-center justify-center mb-6">
+          <div className="w-12 h-12 rounded-xl bg-gradient-to-br from-blue-600 to-teal-500 flex items-center justify-center text-white font-bold text-xl">
+            A
+          </div>
+        </div>
+
+        <h1 className="text-2xl font-bold text-slate-900 text-center">
+          Admin Login
+        </h1>
+
+        <p className="mt-2 text-center text-slate-600 text-sm">
+          Only administrators are allowed to access this panel
+        </p>
+
+        <form onSubmit={handleLogin} className="mt-8 space-y-5">
           <input
-            type="text"
+            type="email"
+            placeholder="Admin Email"
+            className="input"
             value={email}
             onChange={(e) => setEmail(e.target.value)}
-            placeholder="Email"
+            required
           />
 
           <input
             type="password"
+            placeholder="Password"
+            className="input"
             value={password}
             onChange={(e) => setPassword(e.target.value)}
-            placeholder="Password"
+            required
           />
 
+          {/* Required because backend needs it */}
           <input
             type="password"
+            placeholder="Confirm Password"
+            className="input"
             value={confirmPassword}
             onChange={(e) => setConfirmPassword(e.target.value)}
-            placeholder="Confirm Password"
+            required
           />
 
-          <div style={{ justifyContent: "center", alignItems: "center" }}>
-            <button type="submit">Login</button>
-          </div>
+          <button
+            type="submit"
+            className="w-full py-3 rounded-xl bg-gradient-to-r from-blue-600 to-teal-500 text-white font-medium hover:opacity-90 transition"
+          >
+            Login to Dashboard
+          </button>
         </form>
       </div>
-    </>
+    </section>
   );
 };
 

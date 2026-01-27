@@ -1,6 +1,6 @@
 import axios from "axios";
 import React, { useEffect, useState } from "react";
-import { Link, useNavigate } from "react-router-dom";
+import { useNavigate } from "react-router-dom";
 import { toast } from "react-toastify";
 
 const AppointmentForm = () => {
@@ -11,11 +11,11 @@ const AppointmentForm = () => {
   const [patientId, setPatientId] = useState("");
   const [dob, setDob] = useState("");
   const [gender, setGender] = useState("");
-  const [appointmentDate, setappointmentDate] = useState("");
-  const [department, setdepartment] = useState("");
-  const [doctorFirstName, setdoctorFirstName] = useState("");
-  const [doctorLastName, setdoctorLastName] = useState("");
-  const [address, setaddress] = useState("");
+  const [appointmentDate, setAppointmentDate] = useState("");
+  const [department, setDepartment] = useState("");
+  const [doctorFirstName, setDoctorFirstName] = useState("");
+  const [doctorLastName, setDoctorLastName] = useState("");
+  const [address, setAddress] = useState("");
   const [hasVisited, setHasVisited] = useState(false);
   const [doctors, setDoctors] = useState([]);
 
@@ -29,28 +29,22 @@ const AppointmentForm = () => {
     "Cardiology",
   ];
 
-  //   http://localhost:3000/api/v1/user/allDoc
-
   const baseurl = import.meta.env.VITE_API_BASE_URL;
+  const navigateTo = useNavigate();
 
   useEffect(() => {
     const fetchDoctors = async () => {
-      const { data } = await axios.get(
-        `${baseurl}/api/v1/user/allDoc`,
-        // {},
-        { withCredentials: true },
-      );
+      const { data } = await axios.get(`${baseurl}/api/v1/user/allDoc`, {
+        withCredentials: true,
+      });
       setDoctors(data.users || []);
     };
     fetchDoctors();
   }, [baseurl]);
 
-  const navigateTo = useNavigate();
-
   const handleAppointment = async (e) => {
     e.preventDefault();
     try {
-      const hasVisitedBool = Boolean(hasVisited);
       const { data } = await axios.post(
         `${baseurl}/api/v1/appointment/book`,
         {
@@ -66,164 +60,173 @@ const AppointmentForm = () => {
           doctor_firstName: doctorFirstName,
           doctor_lastName: doctorLastName,
           address,
-          hasVisited: hasVisitedBool,
+          hasVisited,
         },
-        {
-          withCredentials: true,
-          headers: {
-            "Content-Type": "application/json",
-          },
-        },
+        { withCredentials: true },
       );
+
       toast.success(data.message);
       navigateTo("/");
     } catch (error) {
-      toast.error(error.reponse.data.message);
+      toast.error("Failed to book appointment", error.message);
     }
   };
 
-  console.log("Selected department:", department);
-  console.log(
-    "Doctors departments:",
-    doctors.map((d) => d.doctorDepartment),
-  );
-
   return (
-    <div className="container form-component appointment-form">
-      <h2>Appointment</h2>
+    <section className="pt-28 pb-20 bg-slate-50">
+      <div className="max-w-3xl mx-auto px-6">
+        <div className="bg-white rounded-2xl shadow-lg border border-slate-200 p-8">
+          <h2 className="text-3xl font-bold text-slate-900 mb-8 text-center">
+            Book an Appointment
+          </h2>
 
-      <form onSubmit={handleAppointment}>
-        <div>
-          <input
-            type="text"
-            placeholder="First Name"
-            value={firstName}
-            onChange={(e) => setFirstName(e.target.value)}
-          />
-          <input
-            type="text"
-            placeholder="Last Name"
-            value={lastName}
-            onChange={(e) => setLastName(e.target.value)}
-          />
-        </div>
+          <form onSubmit={handleAppointment} className="space-y-6">
+            {/* Name */}
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+              <input
+                type="text"
+                placeholder="First Name"
+                className="input"
+                value={firstName}
+                onChange={(e) => setFirstName(e.target.value)}
+              />
+              <input
+                type="text"
+                placeholder="Last Name"
+                className="input"
+                value={lastName}
+                onChange={(e) => setLastName(e.target.value)}
+              />
+            </div>
 
-        <div>
-          <input
-            type="email"
-            placeholder="Email"
-            value={email}
-            onChange={(e) => setEmail(e.target.value)}
-          />
-          <input
-            type="tel"
-            placeholder="Phone Number"
-            value={phone}
-            onChange={(e) => setPhone(e.target.value)}
-          />
-        </div>
+            {/* Email & Phone */}
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+              <input
+                type="email"
+                placeholder="Email"
+                className="input"
+                value={email}
+                onChange={(e) => setEmail(e.target.value)}
+              />
+              <input
+                type="tel"
+                placeholder="Phone Number"
+                className="input"
+                value={phone}
+                onChange={(e) => setPhone(e.target.value)}
+              />
+            </div>
 
-        <div>
-          <input
-            type="text"
-            placeholder="Patient ID"
-            value={patientId}
-            onChange={(e) => setPatientId(e.target.value)}
-          />
-          <input
-            type="date"
-            value={dob}
-            onChange={(e) => setDob(e.target.value)}
-          />
-        </div>
+            {/* Patient & DOB */}
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+              <input
+                type="text"
+                placeholder="Patient ID"
+                className="input"
+                value={patientId}
+                onChange={(e) => setPatientId(e.target.value)}
+              />
+              <input
+                type="date"
+                className="input"
+                value={dob}
+                onChange={(e) => setDob(e.target.value)}
+              />
+            </div>
 
-        <div>
-          <select value={gender} onChange={(e) => setGender(e.target.value)}>
-            <option value="">Select Gender</option>
-            <option value="Male">Male</option>
-            <option value="Female">Female</option>
-          </select>
-          <input
-            type="date"
-            placeholder="Appointment Date"
-            value={appointmentDate}
-            onChange={(e) => setappointmentDate(e.target.value)}
-          />
-        </div>
+            {/* Gender & Appointment Date */}
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+              <select
+                className="input"
+                value={gender}
+                onChange={(e) => setGender(e.target.value)}
+              >
+                <option value="">Select Gender</option>
+                <option>Male</option>
+                <option>Female</option>
+              </select>
 
-        <div>
-          <select
-            value={department}
-            onChange={(e) => {
-              setdepartment(e.target.value);
-              setdoctorFirstName("");
-              setdoctorLastName("");
-            }}
-          >
-            <option value="">Select Department</option>
-            {departmentsArray.map((depart) => (
-              <option value={depart} key={depart}>
-                {depart}
-              </option>
-            ))}
-          </select>
+              <input
+                type="date"
+                className="input"
+                value={appointmentDate}
+                onChange={(e) => setAppointmentDate(e.target.value)}
+              />
+            </div>
 
-          <select
-            value={
-              doctorFirstName && doctorLastName
-                ? `${doctorFirstName} ${doctorLastName}`
-                : ""
-            }
-            onChange={(e) => {
-              const [firstName, lastName] = e.target.value.split(" ");
-              setdoctorFirstName(firstName);
-              setdoctorLastName(lastName);
-            }}
-            disabled={!department}
-          >
-            <option value="">Select Doctor</option>
-
-            {Array.isArray(doctors) &&
-              doctors
-                .filter((doctor) => doctor.doctorDepartment === department)
-                .map((doctor) => (
-                  <option
-                    key={doctor._id}
-                    value={`${doctor.firstName} ${doctor.lastName}`}
-                  >
-                    {doctor.firstName} {doctor.lastName}
-                  </option>
+            {/* Department & Doctor */}
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+              <select
+                className="input"
+                value={department}
+                onChange={(e) => {
+                  setDepartment(e.target.value);
+                  setDoctorFirstName("");
+                  setDoctorLastName("");
+                }}
+              >
+                <option value="">Select Department</option>
+                {departmentsArray.map((d) => (
+                  <option key={d}>{d}</option>
                 ))}
-          </select>
-        </div>
-        <textarea
-          rows={10}
-          value={address}
-          onChange={(e) => setaddress(e.target.value)}
-          placeholder="Address"
-        ></textarea>
+              </select>
 
-        <div
-          style={{
-            gap: "10px",
-            justifyContent: "flex-end",
-            flexDirection: "row",
-          }}
-        >
-          <p style={{ marginBottom: 0 }}>Habe you visited before?</p>
-          <input
-            type="checkbox"
-            checked={hasVisited}
-            onChange={(e) => setHasVisited(e.target.value)}
-            style={{ flex: "none", width: "25px" }}
-          />
-        </div>
+              <select
+                className="input"
+                disabled={!department}
+                value={
+                  doctorFirstName && doctorLastName
+                    ? `${doctorFirstName} ${doctorLastName}`
+                    : ""
+                }
+                onChange={(e) => {
+                  const [f, l] = e.target.value.split(" ");
+                  setDoctorFirstName(f);
+                  setDoctorLastName(l);
+                }}
+              >
+                <option value="">Select Doctor</option>
+                {doctors
+                  .filter((doc) => doc.doctorDepartment === department)
+                  .map((doc) => (
+                    <option key={doc._id}>
+                      {doc.firstName} {doc.lastName}
+                    </option>
+                  ))}
+              </select>
+            </div>
 
-        <div style={{ justifyContent: "center" }}>
-          <button type="submit">Book Appointment</button>
+            {/* Address */}
+            <textarea
+              rows={4}
+              className="input resize-none"
+              placeholder="Address"
+              value={address}
+              onChange={(e) => setAddress(e.target.value)}
+            />
+
+            {/* Checkbox */}
+            <label className="flex items-center gap-3 text-slate-700">
+              <input
+                type="checkbox"
+                checked={hasVisited}
+                onChange={(e) => setHasVisited(e.target.checked)}
+                className="w-5 h-5 accent-blue-600"
+              />
+              Have you visited before?
+            </label>
+
+            {/* Submit */}
+            <button
+              type="submit"
+              className="w-full py-3 rounded-xl bg-gradient-to-r from-blue-600 to-teal-500 text-white font-medium hover:opacity-90 transition"
+            >
+              Book Appointment
+            </button>
+          </form>
         </div>
-      </form>
-    </div>
+      </div>
+    </section>
   );
 };
 

@@ -258,3 +258,50 @@ export const addNewDoctor = catchAsyncErros(async (req, res, next) => {
     doctor,
   });
 });
+
+export const updateDoctor = catchAsyncErros(async (req, res, next) => {
+  const { id } = req.params;
+
+  const updates = req.body;
+  if (Object.keys(updates).length === 0) {
+    return next(new ErrorHandler("No fields provided to update", 400));
+  }
+
+  const doctor = await User.findOne({ _id: id, role: "doctor" });
+  if (!doctor) {
+    return next(new ErrorHandler("Doctor Not Found!", 404));
+  }
+
+  // Prevent duplicate email
+  if (updates.email && updates.email !== doctor.email) {
+    const emailExists = await User.findOne({ email: updates.email });
+    if (emailExists) {
+      return next(new ErrorHandler("Email already in use", 400));
+    }
+  }
+
+  Object.assign(doctor, updates);
+  await doctor.save();
+
+  res.status(200).json({
+    success: true,
+    message: "Doctor Details Updated Successfully",
+    doctor,
+  });
+});
+
+export const deleteDoctor = catchAsyncErros(async (req, res, next) => {
+  const { id } = req.params;
+
+  const doctor = await User.findOne({ _id: id, role: "doctor" });
+  if (!doctor) {
+    return next(new ErrorHandler("Doctor Not Found!", 404));
+  }
+
+  await doctor.deleteOne();
+
+  res.status(200).json({
+    success: true,
+    message: "Doctor Deleted Successfully",
+  });
+});

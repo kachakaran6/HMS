@@ -13,6 +13,8 @@ import "react-toastify/dist/ReactToastify.css";
 import { Context } from "./main";
 import axios from "axios";
 import "./App.css";
+import DashboardLayout from "./layouts/DashboardLayout";
+import Appointments from "./components/Appointments";
 
 const App = () => {
   const { isAuthenticated, setIsAuthenticated, setUser } = useContext(Context);
@@ -36,15 +38,21 @@ const App = () => {
   return (
     <>
       <Router>
-        <SideBar />
         <Routes>
-          <Route path="/" element={<Dashboard />} />
+          {/* Public route */}
           <Route path="/login" element={<Login />} />
-          <Route path="/doctor/addnew" element={<AddNewDoctor />} />
-          <Route path="/admin/addnew" element={<AddNewAdmin />} />
-          <Route path="/messages" element={<Message />} />
-          <Route path="/doctors" element={<Doctor />} />
+
+          {/* Dashboard routes */}
+          <Route element={<DashboardLayout />}>
+            <Route path="/" element={<Dashboard />} />
+            <Route path="/doctors" element={<Doctor />} />
+            <Route path="/appointments" element={<Appointments />} />
+            <Route path="/doctor/addnew" element={<AddNewDoctor />} />
+            <Route path="/admin/addnew" element={<AddNewAdmin />} />
+            <Route path="/messages" element={<Message />} />
+          </Route>
         </Routes>
+
         <ToastContainer position="top-center" />
       </Router>
     </>

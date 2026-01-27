@@ -53,72 +53,97 @@ const AddNewAdmin = () => {
   }
 
   return (
-    <section className="page">
-      <div className="container form-component add-admin-form">
-        <h2>Add Admin</h2>
-        <p>Please enter details of admin</p>
+    <section className="space-y-6">
+      <div className="max-w-2xl bg-white rounded-2xl shadow p-8">
+        <h2 className="text-2xl font-bold text-slate-900">Add Admin</h2>
 
-        <form onSubmit={handleAddNew}>
-          <div>
+        <p className="mt-1 text-slate-600">
+          Please enter details of the new administrator
+        </p>
+
+        <form onSubmit={handleAddNew} className="mt-6 space-y-5">
+          {/* Name */}
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
             <input
               type="text"
               placeholder="First Name"
+              className="input"
               value={firstName}
               onChange={(e) => setFirstName(e.target.value)}
             />
             <input
               type="text"
               placeholder="Last Name"
+              className="input"
               value={lastName}
               onChange={(e) => setLastName(e.target.value)}
             />
           </div>
 
-          <input
-            type="email"
-            placeholder="Email"
-            value={email}
-            onChange={(e) => setEmail(e.target.value)}
-          />
-          <input
-            type="tel"
-            placeholder="Phone Number"
-            value={phone}
-            onChange={(e) => setPhone(e.target.value)}
-          />
+          {/* Email & Phone */}
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <input
+              type="email"
+              placeholder="Email"
+              className="input"
+              value={email}
+              onChange={(e) => setEmail(e.target.value)}
+            />
+            <input
+              type="tel"
+              placeholder="Phone Number"
+              className="input"
+              value={phone}
+              onChange={(e) => setPhone(e.target.value)}
+            />
+          </div>
 
-          <input
-            type="text"
-            placeholder="Patient ID"
-            value={patientId}
-            onChange={(e) => setPatientId(e.target.value)}
-          />
-          <input
-            type="date"
-            value={dob}
-            onChange={(e) => setDob(e.target.value)}
-          />
+          {/* Patient ID & DOB */}
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <input
+              type="text"
+              placeholder="Patient ID"
+              className="input"
+              value={patientId}
+              onChange={(e) => setPatientId(e.target.value)}
+            />
+            <input
+              type="date"
+              className="input"
+              value={dob}
+              onChange={(e) => setDob(e.target.value)}
+            />
+          </div>
 
-          <select value={gender} onChange={(e) => setGender(e.target.value)}>
-            <option value="">Select Gender</option>
-            <option value="Male">Male</option>
-            <option value="Female">Female</option>
-          </select>
+          {/* Gender & Password */}
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <select
+              className="input"
+              value={gender}
+              onChange={(e) => setGender(e.target.value)}
+            >
+              <option value="">Select Gender</option>
+              <option value="Male">Male</option>
+              <option value="Female">Female</option>
+            </select>
 
-          <input
-            type="password"
-            placeholder="Password"
-            value={password}
-            onChange={(e) => setPassword(e.target.value)}
-          />
+            <input
+              type="password"
+              placeholder="Password"
+              className="input"
+              value={password}
+              onChange={(e) => setPassword(e.target.value)}
+            />
+          </div>
 
-          {/* <div style={{ gap: "10px", justifyContent: "flex-end" }}>
-            <p style={{ marginBottom: 0 }}>Already Registered?</p>
-            <Link to="/login">Login Now</Link>
-          </div> */}
-
-          <div style={{ justifyContent: "center" }}>
-            <button type="submit">Register</button>
+          {/* Submit */}
+          <div className="pt-4">
+            <button
+              type="submit"
+              className="w-full md:w-auto px-8 py-3 rounded-xl bg-gradient-to-r from-blue-600 to-teal-500 text-white font-medium hover:opacity-90 transition"
+            >
+              Register Admin
+            </button>
           </div>
         </form>
       </div>

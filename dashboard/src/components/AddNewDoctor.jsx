@@ -93,89 +93,127 @@ const AddNewDoctor = () => {
   }
 
   return (
-    <section className="page">
-      <div className="container form-component add-doctor-form">
-        <h2>Add Doctor</h2>
-        <p>Please enter details of doctor</p>
+    <section className="space-y-6">
+      <div className="max-w-3xl bg-white rounded-2xl shadow p-8">
+        <h2 className="text-2xl font-bold text-slate-900">Add Doctor</h2>
 
-        <form onSubmit={handleAddNewDoc}>
-          <div className="first-wrapper">
-            <div>
-              <img
-                src={
-                  docAvatarPreview ? `${docAvatarPreview}` : "/docHolder.jpg"
-                }
-                alt="Doctor Avatar"
-              />
-            </div>
+        <p className="mt-1 text-slate-600">
+          Please enter details of the doctor
+        </p>
 
-            <div>
-              <input type="file" onChange={handleAvatar} />
-              <input
-                type="text"
-                placeholder="First Name"
-                value={firstName}
-                onChange={(e) => setFirstName(e.target.value)}
-              />
-              <input
-                type="text"
-                placeholder="Last Name"
-                value={lastName}
-                onChange={(e) => setLastName(e.target.value)}
-              />
-              <input
-                type="email"
-                placeholder="Email"
-                value={email}
-                onChange={(e) => setEmail(e.target.value)}
-              />
-              <input
-                type="tel"
-                placeholder="Phone Number"
-                value={phone}
-                onChange={(e) => setPhone(e.target.value)}
-              />
-              <input
-                type="text"
-                placeholder="Patient ID"
-                value={patientId}
-                onChange={(e) => setPatientId(e.target.value)}
-              />
-              <input
-                type="date"
-                value={dob}
-                onChange={(e) => setDob(e.target.value)}
-              />
-              <select
-                value={gender}
-                onChange={(e) => setGender(e.target.value)}
-              >
-                <option value="">Select Gender</option>
-                <option value="Male">Male</option>
-                <option value="Female">Female</option>
-              </select>
+        <form onSubmit={handleAddNewDoc} className="mt-6 space-y-6">
+          {/* Avatar + Upload */}
+          <div className="flex flex-col md:flex-row gap-6 items-center">
+            <img
+              src={docAvatarPreview ? docAvatarPreview : "/docHolder.jpg"}
+              alt="Doctor Avatar"
+              className="w-32 h-32 rounded-full object-cover border"
+            />
 
-              <input
-                type="password"
-                placeholder="Password"
-                value={password}
-                onChange={(e) => setPassword(e.target.value)}
-              />
-              <select
-                name="doctorDepartment"
-                id=""
-                value={docDepartment}
-                onChange={(e) => setDocDepartment(e.target.value)}
-              >
-                <option value="">Select Department</option>
-                {departmentsArray.map((depart) => (
-                  <option value={depart} key={depart}>
-                    {depart}
-                  </option>
-                ))}
-              </select>
-              <button type="submit">Add Doctor</button>
-            </div>
+            <label className="cursor-pointer">
+              <span className="inline-block px-4 py-2 rounded-lg bg-slate-100 text-slate-700 hover:bg-slate-200 transition">
+                Upload Avatar
+              </span>
+              <input type="file" onChange={handleAvatar} className="hidden" />
+            </label>
+          </div>
+
+          {/* Name */}
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <input
+              type="text"
+              placeholder="First Name"
+              className="input"
+              value={firstName}
+              onChange={(e) => setFirstName(e.target.value)}
+            />
+            <input
+              type="text"
+              placeholder="Last Name"
+              className="input"
+              value={lastName}
+              onChange={(e) => setLastName(e.target.value)}
+            />
+          </div>
+
+          {/* Email & Phone */}
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <input
+              type="email"
+              placeholder="Email"
+              className="input"
+              value={email}
+              onChange={(e) => setEmail(e.target.value)}
+            />
+            <input
+              type="tel"
+              placeholder="Phone Number"
+              className="input"
+              value={phone}
+              onChange={(e) => setPhone(e.target.value)}
+            />
+          </div>
+
+          {/* Patient ID & DOB */}
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <input
+              type="text"
+              placeholder="Patient ID"
+              className="input"
+              value={patientId}
+              onChange={(e) => setPatientId(e.target.value)}
+            />
+            <input
+              type="date"
+              className="input"
+              value={dob}
+              onChange={(e) => setDob(e.target.value)}
+            />
+          </div>
+
+          {/* Gender & Password */}
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <select
+              className="input"
+              value={gender}
+              onChange={(e) => setGender(e.target.value)}
+            >
+              <option value="">Select Gender</option>
+              <option value="Male">Male</option>
+              <option value="Female">Female</option>
+            </select>
+
+            <input
+              type="password"
+              placeholder="Password"
+              className="input"
+              value={password}
+              onChange={(e) => setPassword(e.target.value)}
+            />
+          </div>
+
+          {/* Department */}
+          <select
+            className="input"
+            value={docDepartment}
+            onChange={(e) => setDocDepartment(e.target.value)}
+          >
+            <option value="">Select Department</option>
+            {departmentsArray.map((depart) => (
+              <option value={depart} key={depart}>
+                {depart}
+              </option>
+            ))}
+          </select>
+
+          {/* Submit */}
+          <div className="pt-4">
+            <button
+              type="submit"
+              className="w-full md:w-auto px-8 py-3 rounded-xl bg-gradient-to-r from-blue-600 to-teal-500 text-white font-medium hover:opacity-90 transition"
+            >
+              Add Doctor
+            </button>
           </div>
         </form>
       </div>
