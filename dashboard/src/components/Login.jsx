@@ -3,6 +3,14 @@ import { Context } from "../main";
 import { toast } from "react-toastify";
 import axios from "axios";
 import { useNavigate } from "react-router-dom";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
+import { Shield, Stethoscope } from "lucide-react";
 
 const Login = () => {
   const { isAuthenticated, setIsAuthenticated } = useContext(Context);
@@ -98,10 +106,25 @@ const Login = () => {
             required
           />
 
-          <select value={role} onChange={(e) => setRole(e.target.value)}>
-            <option value="admin">Admin</option>
-            <option value="doctor">Doctor</option>
-          </select>
+          <Select value={role} onValueChange={setRole}>
+            <SelectTrigger className="w-[40%] rounded-xl">
+              <SelectValue placeholder="Login as" />
+            </SelectTrigger>
+
+            <SelectContent className="bg-white border shadow-lg rounded-xl">
+              <SelectItem value="admin">
+                <div className="flex items-center gap-2">
+                  <Shield size={16} /> Admin
+                </div>
+              </SelectItem>
+
+              <SelectItem value="doctor">
+                <div className="flex items-center gap-2">
+                  <Stethoscope size={16} /> Doctor
+                </div>
+              </SelectItem>
+            </SelectContent>
+          </Select>
 
           <button
             type="submit"
