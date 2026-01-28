@@ -4,6 +4,9 @@ import ErrorHandler from "../middlewares/errorMiddleware.js";
 import { generateToken } from "../utils/jwtTokens.js";
 import { isAdminAuthenticated } from "../middlewares/auth.js";
 import cloudinary from "cloudinary";
+import crypto from "crypto";
+import { sendEmailOTP } from "../utils/sendEmailOTP.js";
+
 export const registerUser = catchAsyncErros(async (req, res, next) => {
   const {
     firstName,
@@ -80,6 +83,12 @@ export const login = catchAsyncErros(async (req, res, next) => {
       new ErrorHandler(`You don't have access as you are ${user.role}`, 400),
     );
   }
+  if (!user.emailVerified) {
+    return next(
+      new ErrorHandler("Email not verified. Please verify OTP.", 403),
+    );
+  }
+
   generateToken(user, "Login Successfully!", 201, res);
 });
 
@@ -200,8 +209,9 @@ export const logoutUser = catchAsyncErros(async (req, res, next) => {
 
 export const addNewDoctor = catchAsyncErros(async (req, res, next) => {
   if (!req.files || Object.keys(req.files).length === 0) {
-    return next(new ErrorHandler("Docotor Avatar Required!", 400));
+    return next(new ErrorHandler("Doctor Avatar Required!", 400));
   }
+
   const { docAvatar } = req.files;
   const allowedFormats = ["image/jpg", "image/jpeg", "image/png"];
   if (!allowedFormats.includes(docAvatar.mimetype)) {
@@ -221,6 +231,7 @@ export const addNewDoctor = catchAsyncErros(async (req, res, next) => {
     patientId,
     doctorDepartment,
   } = req.body;
+
   if (
     !firstName ||
     !lastName ||
@@ -251,11 +262,7 @@ export const addNewDoctor = catchAsyncErros(async (req, res, next) => {
     },
   );
 
-  if (!cloudinaryResponse || cloudinaryResponse.error) {
-    console.error("Cloudinary Upload Error:", cloudinaryResponse.error);
-    return next(new ErrorHandler("Failed to upload doctor avatar", 500));
-  }
-
+  // 👉 CREATE DOCTOR AS UNVERIFIED
   const doctor = await User.create({
     firstName,
     lastName,
@@ -267,16 +274,26 @@ export const addNewDoctor = catchAsyncErros(async (req, res, next) => {
     patientId,
     doctorDepartment,
     role: "doctor",
+    emailVerified: false, // 🔥 KEY LINE
     docAvatar: {
       public_id: cloudinaryResponse.public_id,
       url: cloudinaryResponse.secure_url,
     },
   });
 
+  // 👉 SEND OTP USING SAME LOGIC
+  const otp = Math.floor(100000 + Math.random() * 900000).toString();
+  const hashedOTP = crypto.createHash("sha256").update(otp).digest("hex");
+
+  doctor.emailOTP = hashedOTP;
+  doctor.emailOTPExpire = Date.now() + 5 * 60 * 1000;
+  await doctor.save();
+
+  await sendEmailOTP(email, otp);
+
   res.status(200).json({
     success: true,
-    message: "New Doctor Registered",
-    doctor,
+    message: "Doctor added. OTP sent to doctor email for verification.",
   });
 });
 

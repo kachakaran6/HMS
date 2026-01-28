@@ -243,5 +243,6 @@ router.post("/userLogout", logoutUser);
 router.get("/patient/me", isPatientAuthenticated, getUserDetails);
 router.get("/admin/me", isAdminAuthenticated, getUserDetails);
 router.get("/doctor/me", isDoctorAuthenticated, getUserDetails);
+router.get("/all", getUsers);
 
 export default router;

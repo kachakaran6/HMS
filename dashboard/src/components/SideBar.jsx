@@ -8,6 +8,7 @@ import { AiFillMessage } from "react-icons/ai";
 import { RiLogoutBoxFill } from "react-icons/ri";
 import { TiHome } from "react-icons/ti";
 import { FaUserMd, FaCalendarCheck } from "react-icons/fa";
+import { FaUser } from "react-icons/fa";
 import { MdAddModerator } from "react-icons/md";
 import { IoPersonAddSharp } from "react-icons/io5";
 
@@ -39,7 +40,7 @@ const SideBar = ({ onLinkClick }) => {
   const activeClass = "bg-blue-600 text-white hover:bg-blue-600";
 
   return (
-    <aside className="h-[100vh] w-64 bg-white border-r border-slate-200 flex flex-col">
+    <aside className="w-64 min-h-screen bg-white border-r border-slate-200 flex flex-col">
       {/* Logo */}
       <div className="p-4 border-b">
         <h2 className="text-xl font-bold text-slate-900">HMS Admin</h2>
@@ -81,6 +82,9 @@ const SideBar = ({ onLinkClick }) => {
         {/* ADMIN ONLY */}
         {role === "admin" && (
           <>
+            <NavLink to="/users" className={linkClass}>
+              <FaUser /> All Users
+            </NavLink>
             <NavLink to="/admin/addnew" className={linkClass}>
               <MdAddModerator /> Add Admin
             </NavLink>

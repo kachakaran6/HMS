@@ -61,6 +61,16 @@ const userSchema = new mongoose.Schema(
       public_id: String,
       url: String,
     },
+    emailOTP: {
+      type: String,
+    },
+    emailOTPExpire: {
+      type: Date,
+    },
+    emailVerified: {
+      type: Boolean,
+      default: false,
+    },
   },
   {
     timestamps: true,

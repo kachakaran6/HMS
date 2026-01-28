@@ -1,18 +1,30 @@
-import React, { useEffect, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import axios from "axios";
-import { toast } from "react-toastify";
+import { toast } from "sonner";
 import { GoCheckCircleFill } from "react-icons/go";
 import { AiFillCloseCircle } from "react-icons/ai";
+
+import { Input } from "@/components/ui/input";
+import { Button } from "@/components/ui/button";
+import { Badge } from "@/components/ui/badge";
+import {
+  Table,
+  TableBody,
+  TableCell,
+  TableHead,
+  TableHeader,
+  TableRow,
+} from "@/components/ui/table";
 
 const Appointments = () => {
   const baseURL = import.meta.env.VITE_API_BASE_URL;
 
   const [appointments, setAppointments] = useState([]);
   const [search, setSearch] = useState("");
-  const [statusFilter, setStatusFilter] = useState("");
+  const [statusFilter, setStatusFilter] = useState("all");
   const [sortOrder, setSortOrder] = useState("latest");
 
-  // 🔹 FETCH APPOINTMENTS
+  // 🔹 FETCH
   useEffect(() => {
     const fetchAppointments = async () => {
       try {
@@ -20,50 +32,65 @@ const Appointments = () => {
           withCredentials: true,
         });
         setAppointments(data.appointements || []);
-      } catch (error) {
-        toast.error("Failed to fetch appointments", error.message);
+      } catch {
+        toast.error("Failed to fetch appointments", { position: "top-right" });
       }
     };
-
     fetchAppointments();
   }, [baseURL]);
 
   // 🔹 FILTER + SEARCH + SORT
-  const filteredAppointments = appointments
-    .filter((a) => {
-      const query = search.toLowerCase();
-      return (
-        a.firstName.toLowerCase().includes(query) ||
-        a.lastName.toLowerCase().includes(query) ||
-        a.department.toLowerCase().includes(query) ||
-        a.doctor?.firstName?.toLowerCase().includes(query) ||
-        a.doctor?.lastName?.toLowerCase().includes(query)
+  const filteredAppointments = useMemo(() => {
+    return appointments
+      .filter((a) => {
+        const q = search.toLowerCase();
+        return (
+          a.firstName.toLowerCase().includes(q) ||
+          a.lastName.toLowerCase().includes(q) ||
+          a.department.toLowerCase().includes(q) ||
+          a.doctor?.firstName?.toLowerCase().includes(q) ||
+          a.doctor?.lastName?.toLowerCase().includes(q)
+        );
+      })
+      .filter((a) =>
+        statusFilter === "all" ? true : a.status === statusFilter,
+      )
+      .sort((a, b) =>
+        sortOrder === "latest"
+          ? new Date(b.appointment_date) - new Date(a.appointment_date)
+          : new Date(a.appointment_date) - new Date(b.appointment_date),
       );
-    })
-    .filter((a) => (statusFilter ? a.status === statusFilter : true))
-    .sort((a, b) => {
-      if (sortOrder === "latest") {
-        return new Date(b.appointment_date) - new Date(a.appointment_date);
-      }
-      return new Date(a.appointment_date) - new Date(b.appointment_date);
-    });
+  }, [appointments, search, statusFilter, sortOrder]);
 
   // 🔹 UPDATE STATUS
-  const handleUpdateStatus = async (appointmentId, status) => {
+  const handleUpdateStatus = async (id, status) => {
     try {
       await axios.put(
-        `${baseURL}/api/v1/appointment/update/${appointmentId}`,
+        `${baseURL}/api/v1/appointment/update/${id}`,
         { status },
         { withCredentials: true },
       );
 
       setAppointments((prev) =>
-        prev.map((a) => (a._id === appointmentId ? { ...a, status } : a)),
+        prev.map((a) => (a._id === id ? { ...a, status } : a)),
       );
 
-      toast.success("Appointment updated");
+      toast.success("Appointment updated", { position: "top-right" });
     } catch {
-      toast.error("Failed to update appointment");
+      toast.error("Failed to update appointment", { position: "top-right" });
+    }
+  };
+
+  const statusBadge = (status) => {
+    switch (status) {
+      case "Pending":
+        return <Badge className="bg-yellow-100 text-yellow-700">Pending</Badge>;
+      case "Cancelled":
+        return <Badge className="bg-red-100 text-red-700">Cancelled</Badge>;
+      case "Completed":
+        return <Badge className="bg-blue-100 text-blue-700">Completed</Badge>;
+      default:
+        return <Badge className="bg-green-100 text-green-700">Confirmed</Badge>;
     }
   };
 
@@ -71,26 +98,22 @@ const Appointments = () => {
     <section className="space-y-6">
       <h1 className="text-2xl font-bold text-slate-900">Appointments</h1>
 
-      {/* 🔹 CONTROLS */}
-      {/* 🔹 CONTROLS */}
-      <div className="bg-white rounded-2xl shadow p-6 space-y-4">
-        {/* Search (full width) */}
-        <input
-          type="text"
-          placeholder="Search by patient, doctor, department..."
-          className="input w-full text-base"
+      {/* 🔹 FILTER BAR */}
+      <div className="bg-white border shadow-sm rounded-2xl p-6 space-y-4">
+        <Input
+          placeholder="Search patient, doctor, department..."
           value={search}
           onChange={(e) => setSearch(e.target.value)}
+          className="bg-white"
         />
 
-        {/* Filters */}
-        <div className="flex flex-col sm:flex-row gap-4">
+        <div className="flex flex-wrap gap-4">
           <select
-            className="input w-full sm:w-48"
+            className="input w-48"
             value={statusFilter}
             onChange={(e) => setStatusFilter(e.target.value)}
           >
-            <option value="">All Status</option>
+            <option value="all">All Status</option>
             <option value="Pending">Pending</option>
             <option value="Confirmed">Confirmed</option>
             <option value="Cancelled">Cancelled</option>
@@ -98,7 +121,7 @@ const Appointments = () => {
           </select>
 
           <select
-            className="input w-full sm:w-48"
+            className="input w-48"
             value={sortOrder}
             onChange={(e) => setSortOrder(e.target.value)}
           >
@@ -109,79 +132,71 @@ const Appointments = () => {
       </div>
 
       {/* 🔹 TABLE */}
-      <div className="bg-white rounded-2xl shadow p-6 overflow-x-auto">
-        <table className="min-w-full text-sm">
-          <thead>
-            <tr className="border-b text-left text-slate-500">
-              <th className="py-3">Patient</th>
-              <th className="py-3">Doctor</th>
-              <th className="py-3">Department</th>
-              <th className="py-3">Date</th>
-              <th className="py-3">Status</th>
-              <th className="py-3">Visited</th>
-            </tr>
-          </thead>
+      <div className="bg-white border shadow-sm rounded-2xl overflow-x-auto">
+        <Table>
+          <TableHeader>
+            <TableRow>
+              <TableHead>Patient</TableHead>
+              <TableHead>Doctor</TableHead>
+              <TableHead>Department</TableHead>
+              <TableHead>Date</TableHead>
+              <TableHead>Status</TableHead>
+              <TableHead>Visited</TableHead>
+              <TableHead className="text-right">Action</TableHead>
+            </TableRow>
+          </TableHeader>
 
-          <tbody>
-            {filteredAppointments.length > 0 ? (
-              filteredAppointments.map((a) => (
-                <tr key={a._id} className="border-b last:border-none">
-                  <td className="py-3">
-                    {a.firstName} {a.lastName}
-                  </td>
-
-                  <td className="py-3">
-                    Dr. {a.doctor.firstName} {a.doctor.lastName}
-                  </td>
-
-                  <td className="py-3">{a.department}</td>
-
-                  <td className="py-3">
-                    {new Date(a.appointment_date).toLocaleDateString()}
-                  </td>
-
-                  <td className="py-3">
-                    <select
-                      value={a.status}
-                      onChange={(e) =>
-                        handleUpdateStatus(a._id, e.target.value)
-                      }
-                      className={`
-                        px-3 py-1 rounded-lg border text-sm
-                        ${
-                          a.status === "Pending"
-                            ? "bg-yellow-50 text-yellow-700 border-yellow-300"
-                            : a.status === "Cancelled"
-                              ? "bg-red-50 text-red-700 border-red-300"
-                              : "bg-green-50 text-green-700 border-green-300"
-                        }
-                      `}
-                    >
-                      <option value="Pending">Pending</option>
-                      <option value="Confirmed">Confirmed</option>
-                      <option value="Cancelled">Cancelled</option>
-                      <option value="Completed">Completed</option>
-                    </select>
-                  </td>
-
-                  <td className="py-3 text-xl">
-                    {a.hasVisited ? (
-                      <GoCheckCircleFill className="text-green-600" />
-                    ) : (
-                      <AiFillCloseCircle className="text-red-500" />
-                    )}
-                  </td>
-                </tr>
-              ))
-            ) : (
-              <tr>
-                <td colSpan="6" className="py-6 text-center text-slate-500">
+          <TableBody>
+            {filteredAppointments.length === 0 && (
+              <TableRow>
+                <TableCell colSpan={7} className="text-center text-slate-500">
                   No appointments found
-                </td>
-              </tr>
+                </TableCell>
+              </TableRow>
             )}
-          </tbody>
-        </table>
+
+            {filteredAppointments.map((a) => (
+              <TableRow key={a._id}>
+                <TableCell>
+                  {a.firstName} {a.lastName}
+                </TableCell>
+
+                <TableCell>
+                  Dr. {a.doctor.firstName} {a.doctor.lastName}
+                </TableCell>
+
+                <TableCell>{a.department}</TableCell>
+
+                <TableCell>
+                  {new Date(a.appointment_date).toLocaleDateString()}
+                </TableCell>
+
+                <TableCell>{statusBadge(a.status)}</TableCell>
+
+                <TableCell className="text-xl">
+                  {a.hasVisited ? (
+                    <GoCheckCircleFill className="text-green-600" />
+                  ) : (
+                    <AiFillCloseCircle className="text-red-500" />
+                  )}
+                </TableCell>
+
+                <TableCell className="text-right">
+                  <select
+                    value={a.status}
+                    onChange={(e) => handleUpdateStatus(a._id, e.target.value)}
+                    className="input w-36"
+                  >
+                    <option value="Pending">Pending</option>
+                    <option value="Confirmed">Confirmed</option>
+                    <option value="Cancelled">Cancelled</option>
+                    <option value="Completed">Completed</option>
+                  </select>
+                </TableCell>
+              </TableRow>
+            ))}
+          </TableBody>
+        </Table>
       </div>
     </section>
   );

@@ -1,5 +1,6 @@
+/* eslint-disable no-unused-vars */
 import axios from "axios";
-import React, { useContext, useState } from "react";
+import React, { useContext, useState, useEffect } from "react";
 import { Navigate, useNavigate } from "react-router-dom";
 import { toast } from "react-toastify";
 import { Context } from "../main";
@@ -18,6 +19,36 @@ const AddNewDoctor = () => {
   const [docDepartment, setDocDepartment] = useState("");
   const [docAvatar, setDocAvatar] = useState("");
   const [docAvatarPreview, setDocAvatarPreview] = useState("");
+  const [otp, setOtp] = useState("");
+  const [showOtpBox, setShowOtpBox] = useState(false);
+  const [otpVerified, setOtpVerified] = useState(false);
+  const [sendingOtp, setSendingOtp] = useState(false);
+  const [verifyingOtp, setVerifyingOtp] = useState(false);
+  const OTP_DURATION = 300; // 5 minutes in seconds
+
+  const [timeLeft, setTimeLeft] = useState(OTP_DURATION);
+  const [canResend, setCanResend] = useState(false);
+
+  useEffect(() => {
+    if (!showOtpBox) return;
+
+    setTimeLeft(OTP_DURATION);
+    setCanResend(false);
+
+    const interval = setInterval(() => {
+      setTimeLeft((prev) => {
+        if (prev <= 1) {
+          clearInterval(interval);
+          setCanResend(true);
+          return 0;
+        }
+        return prev - 1;
+      });
+    }, 1000);
+
+    return () => clearInterval(interval);
+  }, [showOtpBox]);
+
   const baseURL = import.meta.env.VITE_API_BASE_URL;
 
   const departmentsArray = [
@@ -44,21 +75,8 @@ const AddNewDoctor = () => {
 
   const handleAddNewDoc = async (e) => {
     e.preventDefault();
+    setSendingOtp(true);
 
-    //    firstName,
-    // lastName,
-    // email,
-    // phone,
-    // password,
-    // gender,
-    // dob,
-    // patientId,
-    // doctorDepartment,
-    // role: "doctor",
-    // docAvatar: {
-    //   public_id: cloudinaryResponse.public_id,
-    //   url: cloudinaryResponse.secure_url,
-    // },
     try {
       const formData = new FormData();
       formData.append("firstName", firstName);
@@ -71,7 +89,7 @@ const AddNewDoctor = () => {
       formData.append("gender", gender);
       formData.append("doctorDepartment", docDepartment);
       formData.append("docAvatar", docAvatar);
-      // http://localhost:3000/api/v1/user/doctor/addnew
+
       const res = await axios.post(
         `${baseURL}/api/v1/user/doctor/addnew`,
         formData,
@@ -81,10 +99,63 @@ const AddNewDoctor = () => {
         },
       );
 
-      toast.success(res.data.message || "Registered successfully");
-      navigateTo("/");
+      toast.success("Doctor added. OTP sent to doctor email.");
+      setShowOtpBox(true);
     } catch (error) {
       toast.error(error?.response?.data?.message || "Registration failed");
+    } finally {
+      setSendingOtp(false);
+    }
+  };
+
+  const handleResendOtp = async () => {
+    setSendingOtp(true);
+
+    try {
+      const formData = new FormData();
+      formData.append("firstName", firstName);
+      formData.append("lastName", lastName);
+      formData.append("email", email);
+      formData.append("password", password);
+      formData.append("phone", phone);
+      formData.append("patientId", patientId);
+      formData.append("dob", dob);
+      formData.append("gender", gender);
+      formData.append("doctorDepartment", docDepartment);
+      formData.append("docAvatar", docAvatar);
+
+      await axios.post(`${baseURL}/api/v1/user/doctor/addnew`, formData, {
+        withCredentials: true,
+        headers: { "Content-Type": "multipart/form-data" },
+      });
+
+      toast.success("OTP resent successfully");
+      setTimeLeft(OTP_DURATION);
+      setCanResend(false);
+    } catch (error) {
+      toast.error("Failed to resend OTP", error);
+    } finally {
+      setSendingOtp(false);
+    }
+  };
+
+  const handleVerifyOtp = async () => {
+    setVerifyingOtp(true);
+
+    try {
+      const res = await axios.post(
+        `${baseURL}/api/v1/auth/verify-otp`,
+        { email, otp },
+        { withCredentials: true },
+      );
+
+      toast.success("OTP verified successfully");
+      setOtpVerified(true);
+      navigateTo("/");
+    } catch (error) {
+      toast.error(error?.response?.data?.message || "OTP verification failed");
+    } finally {
+      setVerifyingOtp(false);
     }
   };
 
@@ -205,14 +276,65 @@ const AddNewDoctor = () => {
               </option>
             ))}
           </select>
+          {showOtpBox && !otpVerified && (
+            <div className="space-y-4 border-t pt-6">
+              <h3 className="text-lg font-semibold text-slate-900">
+                Email Verification
+              </h3>
+
+              <p className="text-sm text-slate-600">
+                An OTP has been sent to <strong>{email}</strong>
+              </p>
+
+              <input
+                type="text"
+                placeholder="Enter 6-digit OTP"
+                className="input text-center tracking-widest"
+                value={otp}
+                onChange={(e) => setOtp(e.target.value)}
+                maxLength={6}
+                disabled={verifyingOtp}
+              />
+
+              {/* Timer */}
+              <p className="text-sm text-slate-500">
+                OTP expires in{" "}
+                <span className="font-semibold text-slate-700">
+                  {Math.floor(timeLeft / 60)}:
+                  {String(timeLeft % 60).padStart(2, "0")}
+                </span>
+              </p>
+
+              <div className="flex flex-col md:flex-row gap-3">
+                <button
+                  type="button"
+                  onClick={handleVerifyOtp}
+                  disabled={verifyingOtp}
+                  className="px-8 py-3 rounded-xl bg-green-600 text-white font-medium hover:opacity-90 transition disabled:opacity-60"
+                >
+                  {verifyingOtp ? "Verifying OTP..." : "Verify OTP"}
+                </button>
+
+                <button
+                  type="button"
+                  onClick={handleResendOtp}
+                  disabled={!canResend || sendingOtp}
+                  className="px-8 py-3 rounded-xl border border-slate-300 text-slate-700 font-medium hover:bg-slate-100 transition disabled:opacity-50"
+                >
+                  {sendingOtp ? "Resending..." : "Resend OTP"}
+                </button>
+              </div>
+            </div>
+          )}
 
           {/* Submit */}
           <div className="pt-4">
             <button
               type="submit"
-              className="w-full md:w-auto px-8 py-3 rounded-xl bg-gradient-to-r from-blue-600 to-teal-500 text-white font-medium hover:opacity-90 transition"
+              disabled={sendingOtp}
+              className="w-full md:w-auto px-8 py-3 rounded-xl bg-gradient-to-r from-blue-600 to-teal-500 text-white font-medium hover:opacity-90 transition disabled:opacity-60"
             >
-              Add Doctor
+              {sendingOtp ? "Sending OTP..." : "Add Doctor"}
             </button>
           </div>
         </form>

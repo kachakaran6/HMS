@@ -6,6 +6,7 @@ import fileUpload from "express-fileupload";
 import { dbConn } from "./database/db.js";
 import messageRouter from "./router/messageRouter.js";
 import userRouter from "./router/userRouter.js";
+import authRoutes from "./router/authRoutes.js";
 import AppointmentRouter from "./router/appointmentRouter.js";
 import { errorMiddleware } from "./middlewares/errorMiddleware.js";
 import swaggerUi from "swagger-ui-express";
@@ -43,7 +44,7 @@ app.use(
 app.use("/api/v1/message", messageRouter);
 app.use("/api/v1/user", userRouter);
 app.use("/api/v1/appointment", AppointmentRouter);
-
+app.use("/api/v1/auth", authRoutes);
 dbConn();
 
 app.use(errorMiddleware);
