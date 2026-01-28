@@ -15,6 +15,7 @@ import {
 import {
   isAdminAuthenticated,
   isPatientAuthenticated,
+  isDoctorAuthenticated,
 } from "../middlewares/auth.js";
 
 const router = express.Router();
@@ -241,5 +242,6 @@ router.post("/userLogout", logoutUser);
 
 router.get("/patient/me", isPatientAuthenticated, getUserDetails);
 router.get("/admin/me", isAdminAuthenticated, getUserDetails);
+router.get("/doctor/me", isDoctorAuthenticated, getUserDetails);
 
 export default router;

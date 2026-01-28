@@ -10,6 +10,7 @@ const Login = () => {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [confirmPassword, setConfirmPassword] = useState("");
+  const [role, setRole] = useState("admin");
 
   const baseURL = import.meta.env.VITE_API_BASE_URL;
   const navigateTo = useNavigate();
@@ -17,7 +18,6 @@ const Login = () => {
   const handleLogin = async (e) => {
     e.preventDefault();
 
-    // frontend guard
     if (password !== confirmPassword) {
       toast.error("Password and Confirm Password must match");
       return;
@@ -30,7 +30,7 @@ const Login = () => {
           email,
           password,
           confirmPassword,
-          role: "admin",
+          role, // ✅ admin OR doctor
         },
         {
           withCredentials: true,
@@ -39,10 +39,11 @@ const Login = () => {
       );
 
       toast.success(data.message);
+      localStorage.setItem("role", role);
       setIsAuthenticated(true);
       navigateTo("/");
     } catch (error) {
-      toast.error(error.response.data.message || "Login failed");
+      toast.error(error.response?.data?.message || "Login failed");
     }
   };
 
@@ -96,6 +97,11 @@ const Login = () => {
             onChange={(e) => setConfirmPassword(e.target.value)}
             required
           />
+
+          <select value={role} onChange={(e) => setRole(e.target.value)}>
+            <option value="admin">Admin</option>
+            <option value="doctor">Doctor</option>
+          </select>
 
           <button
             type="submit"

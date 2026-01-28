@@ -7,7 +7,7 @@ const DashboardLayout = () => {
   const [sidebarOpen, setSidebarOpen] = useState(false);
 
   return (
-    <div className="min-h-[100svh] bg-slate-100 grid grid-cols-1 lg:grid-cols-[256px_1fr]">
+    <div className="h-screen bg-slate-100 grid grid-cols-1 lg:grid-cols-[256px_1fr] overflow-hidden">
       {/* Desktop Sidebar */}
       <aside className="hidden lg:block bg-white border-r">
         <SideBar />
@@ -40,9 +40,9 @@ const DashboardLayout = () => {
       </div>
 
       {/* Content */}
-      <div className="flex flex-col">
+      <div className="flex flex-col h-full min-h-0">
         <DashboardHeader onMenuClick={() => setSidebarOpen(true)} />
-        <main className="p-6 overflow-x-hidden">
+        <main className="flex-1 p-6 overflow-y-auto overflow-x-hidden">
           <Outlet />
         </main>
       </div>

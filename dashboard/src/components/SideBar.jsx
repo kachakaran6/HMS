@@ -1,4 +1,4 @@
-import { useContext } from "react";
+import { useContext, useState } from "react";
 import { NavLink, useNavigate } from "react-router-dom";
 import { Context } from "../main";
 import axios from "axios";
@@ -15,11 +15,13 @@ const SideBar = ({ onLinkClick }) => {
   const { setIsAuthenticated } = useContext(Context);
   const navigate = useNavigate();
   const baseURL = import.meta.env.VITE_API_BASE_URL;
+  const role = localStorage.getItem("role");
+  //   const [roleState, setRoleState] = useState(role);
 
   const handleLogout = async () => {
     try {
       const { data } = await axios.post(
-        `${baseURL}/api/v1/user/adminLogout`,
+        `${baseURL}/api/v1/user/userLogout`,
         {},
         { withCredentials: true },
       );
@@ -37,7 +39,7 @@ const SideBar = ({ onLinkClick }) => {
   const activeClass = "bg-blue-600 text-white hover:bg-blue-600";
 
   return (
-    <aside className="h-[100svh] w-64 bg-white border-r border-slate-200 flex flex-col">
+    <aside className="h-[100vh] w-64 bg-white border-r border-slate-200 flex flex-col">
       {/* Logo */}
       <div className="p-4 border-b">
         <h2 className="text-xl font-bold text-slate-900">HMS Admin</h2>
@@ -76,27 +78,24 @@ const SideBar = ({ onLinkClick }) => {
           <FaCalendarCheck /> Appointments
         </NavLink>
 
-        <NavLink
-          to="/admin/addnew"
-          className={({ isActive }) =>
-            `${linkClass} ${isActive ? activeClass : ""}`
-          }
-          onClick={onLinkClick}
-        >
-          <MdAddModerator /> Add Admin
-        </NavLink>
+        {/* ADMIN ONLY */}
+        {role === "admin" && (
+          <>
+            <NavLink to="/admin/addnew" className={linkClass}>
+              <MdAddModerator /> Add Admin
+            </NavLink>
 
-        <NavLink
-          to="/doctor/addnew"
-          className={({ isActive }) =>
-            `${linkClass} ${isActive ? activeClass : ""}`
-          }
-          onClick={onLinkClick}
-        >
-          <IoPersonAddSharp /> Add Doctor
-        </NavLink>
+            <NavLink to="/doctor/addnew" className={linkClass}>
+              <IoPersonAddSharp /> Add Doctor
+            </NavLink>
 
-        <NavLink
+            <NavLink to="/messages" className={linkClass}>
+              <AiFillMessage /> Messages
+            </NavLink>
+          </>
+        )}
+
+        {/* <NavLink
           to="/messages"
           className={({ isActive }) =>
             `${linkClass} ${isActive ? activeClass : ""}`
@@ -104,7 +103,7 @@ const SideBar = ({ onLinkClick }) => {
           onClick={onLinkClick}
         >
           <AiFillMessage /> Messages
-        </NavLink>
+        </NavLink> */}
       </nav>
 
       {/* Logout */}

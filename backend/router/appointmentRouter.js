@@ -7,6 +7,7 @@ import {
 } from "../controller/appointmentController.js";
 import {
   isAdminAuthenticated,
+  isDoctorAuthenticated,
   isPatientAuthenticated,
 } from "../middlewares/auth.js";
 
@@ -97,7 +98,7 @@ router.post("/book", isPatientAuthenticated, bookAppointment);
  *       401:
  *         description: Unauthorized
  */
-router.get("/all", isAdminAuthenticated, getAppointments);
+router.get("/all", getAppointments);
 /**
  * @swagger
  * /api/v1/appointment/update/{id}:

@@ -104,6 +104,8 @@ const Doctor = () => {
                 </p>
                 <p>Email: {doctor.email}</p>
                 <p>Phone: {doctor.phone}</p>
+                {/* <p>Id: {doctor._id}</p>
+                <p>Patient Id: {doctor.patientId}</p> */}
               </div>
 
               {/* ACTIONS */}

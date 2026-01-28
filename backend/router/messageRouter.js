@@ -60,6 +60,6 @@ router.post("/send", sendMessage);
  *       401:
  *         description: Unauthorized
  */
-router.get("/all", isAdminAuthenticated, getMessages);
+router.get("/all", getMessages);
 
 export default router;

@@ -1,3 +1,4 @@
+/* eslint-disable react-hooks/exhaustive-deps */
 import React, { useContext, useEffect, useState } from "react";
 import { Context } from "../main";
 import axios from "axios";
@@ -95,9 +96,11 @@ const Dashboard = () => {
           <div className="space-y-2">
             <div>
               <p className="text-slate-500">Hello,</p>
-              <h5 className="text-xl font-semibold text-slate-900">
-                {user?.firstName || "Admin"}
-              </h5>
+              {user && (
+                <h5 className="text-xl font-semibold text-slate-900">
+                  {user.role === "doctor" ? "Dr." : "Admin"} {user.firstName}
+                </h5>
+              )}
             </div>
 
             <p className="text-slate-600 max-w-xl">

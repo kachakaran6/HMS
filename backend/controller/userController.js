@@ -76,7 +76,9 @@ export const login = catchAsyncErros(async (req, res, next) => {
     return next(new ErrorHandler("Invalid Email Or Password!", 400));
   }
   if (role !== user.role) {
-    return next(new ErrorHandler(`User Not Found With This Role!`, 400));
+    return next(
+      new ErrorHandler(`You don't have access as you are ${user.role}`, 400),
+    );
   }
   generateToken(user, "Login Successfully!", 201, res);
 });
@@ -179,6 +181,12 @@ export const logoutUser = catchAsyncErros(async (req, res, next) => {
     })
     // remove admin cookie
     .cookie("admin_token", "", {
+      httpOnly: true,
+      secure: true,
+      sameSite: "None",
+      expires: new Date(0),
+    })
+    .cookie("doctor_token", "", {
       httpOnly: true,
       secure: true,
       sameSite: "None",

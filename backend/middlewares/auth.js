@@ -45,3 +45,37 @@ export const isPatientAuthenticated = catchAsyncErros(
     next();
   },
 );
+
+export const isDoctorAuthenticated = catchAsyncErros(async (req, res, next) => {
+  const token = req.cookies.doctor_token;
+  if (!token) {
+    return next(new ErrorHandler("Doctor not authenticated", 401));
+  }
+  const decoded = jwt.verify(token, process.env.JWT_SECRET_KEY);
+  req.user = await User.findById(decoded.id);
+  if (req.user.role !== "doctor") {
+    return next(
+      new ErrorHandler(
+        "Access denied, not a doctor, pehli fursat me nikal yaha se",
+        403,
+      ),
+    );
+  }
+  next();
+});
+
+export const isAdminOrDoctorAuthenticated = async (req, res, next) => {
+  try {
+    // try admin auth
+    await isAdminAuthenticated(req, res, next);
+  } catch (err) {
+    try {
+      // if admin fails, try doctor
+      await isDoctorAuthenticated(req, res, next);
+    } catch (err) {
+      return next(
+        new ErrorHandler("Admin or Doctor authentication required", 401),
+      );
+    }
+  }
+};

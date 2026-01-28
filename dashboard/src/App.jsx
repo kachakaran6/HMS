@@ -1,61 +1,95 @@
 /* eslint-disable no-unused-vars */
-import React, { useContext, useEffect } from "react";
-import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
+import React, { useContext, useEffect, useState } from "react";
+import {
+  BrowserRouter as Router,
+  Routes,
+  Route,
+  Navigate,
+} from "react-router-dom";
+
 import Dashboard from "./components/Dashboard";
 import Login from "./components/Login";
 import Message from "./components/Message";
 import AddNewAdmin from "./components/AddNewAdmin";
 import AddNewDoctor from "./components/AddNewDoctor";
 import Doctor from "./components/Doctor";
-import SideBar from "./components/SideBar";
+import Appointments from "./components/Appointments";
+import DashboardLayout from "./layouts/DashboardLayout";
+
 import { ToastContainer } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
+
 import { Context } from "./main";
 import axios from "axios";
 import "./App.css";
-import DashboardLayout from "./layouts/DashboardLayout";
-import Appointments from "./components/Appointments";
 
 const App = () => {
   const { isAuthenticated, setIsAuthenticated, setUser } = useContext(Context);
+  const [loading, setLoading] = useState(true);
+
   useEffect(() => {
     const fetchUser = async () => {
       const baseURL = import.meta.env.VITE_API_BASE_URL;
+      const role = localStorage.getItem("role"); // admin | doctor
+
+      if (!role) {
+        setIsAuthenticated(false);
+        setLoading(false);
+        return;
+      }
+
       try {
-        // http://localhost:3000/api/v1/user/patient/me
-        const res = await axios.get(`${baseURL}/api/v1/user/admin/me`, {
+        const res = await axios.get(`${baseURL}/api/v1/user/${role}/me`, {
           withCredentials: true,
         });
-        setIsAuthenticated(true);
+
         setUser(res.data.user);
+        setIsAuthenticated(true);
       } catch (error) {
         setIsAuthenticated(false);
         setUser({});
+        localStorage.removeItem("role");
+      } finally {
+        setLoading(false);
       }
     };
+
     fetchUser();
-  }, [isAuthenticated]);
+  }, []);
+
+  // 🔥 WAIT until auth check finishes
+  if (loading) {
+    return (
+      <div style={{ textAlign: "center", marginTop: "50px" }}>Loading...</div>
+    );
+  }
+
   return (
-    <>
-      <Router>
-        <Routes>
-          {/* Public route */}
-          <Route path="/login" element={<Login />} />
+    <Router>
+      <Routes>
+        {/* Public Route */}
+        <Route
+          path="/login"
+          element={!isAuthenticated ? <Login /> : <Navigate to="/" />}
+        />
 
-          {/* Dashboard routes */}
-          <Route element={<DashboardLayout />}>
-            <Route path="/" element={<Dashboard />} />
-            <Route path="/doctors" element={<Doctor />} />
-            <Route path="/appointments" element={<Appointments />} />
-            <Route path="/doctor/addnew" element={<AddNewDoctor />} />
-            <Route path="/admin/addnew" element={<AddNewAdmin />} />
-            <Route path="/messages" element={<Message />} />
-          </Route>
-        </Routes>
+        {/* Protected Routes */}
+        <Route
+          element={
+            isAuthenticated ? <DashboardLayout /> : <Navigate to="/login" />
+          }
+        >
+          <Route path="/" element={<Dashboard />} />
+          <Route path="/doctors" element={<Doctor />} />
+          <Route path="/appointments" element={<Appointments />} />
+          <Route path="/doctor/addnew" element={<AddNewDoctor />} />
+          <Route path="/admin/addnew" element={<AddNewAdmin />} />
+          <Route path="/messages" element={<Message />} />
+        </Route>
+      </Routes>
 
-        <ToastContainer position="top-center" />
-      </Router>
-    </>
+      <ToastContainer position="top-center" />
+    </Router>
   );
 };
 
