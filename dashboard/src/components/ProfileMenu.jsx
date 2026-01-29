@@ -1,4 +1,4 @@
-import { useState, useContext } from "react";
+import { useState, useContext, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { Context } from "../main";
 import axios from "axios";
@@ -7,9 +7,28 @@ import { toast } from "react-toastify";
 const ProfileMenu = () => {
   const [open, setOpen] = useState(false);
   const navigate = useNavigate();
-  const { setIsAuthenticated } = useContext(Context);
+  const { setIsAuthenticated, isAuthenticated, user } = useContext(Context);
   const role = localStorage.getItem("role");
+  const [doctors, setDoctors] = useState([]);
+
   const baseURL = import.meta.env.VITE_API_BASE_URL;
+
+  const avatarUrl =
+    user?.docAvatar?.url || user?.avatar?.url || "/default-avatar.png";
+
+  useEffect(() => {
+    // http://localhost:3000/api/v1/user/allDoc
+    const fetchDoctors = async () => {
+      const { data } = await axios.get(`${baseURL}/api/v1/user/allDoc`, {
+        withCredentials: true,
+      });
+      setDoctors(data.users || []);
+      console.log(data.users);
+    };
+    fetchDoctors();
+  }, [isAuthenticated]);
+
+  console.log(doctors.firstName + " from profile menu");
 
   const handleLogout = async () => {
     try {
@@ -29,11 +48,12 @@ const ProfileMenu = () => {
   return (
     <div className="relative">
       {/* AVATAR BUTTON */}
-      <button
-        onClick={() => setOpen(!open)}
-        className="w-9 h-9 rounded-full bg-blue-600 text-white flex items-center justify-center text-sm font-semibold"
-      >
-        A
+      <button className="w-9 h-9 rounded-full overflow-hidden border">
+        <img
+          src={avatarUrl}
+          alt="Profile"
+          className="w-full h-full object-cover"
+        />
       </button>
 
       {/* DROPDOWN */}
