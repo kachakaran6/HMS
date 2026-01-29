@@ -1,11 +1,10 @@
-import { useEffect, useMemo, useState } from "react";
+import { useEffect, useMemo, useState, useContext } from "react";
 import axios from "axios";
 import { toast } from "sonner";
 import { GoCheckCircleFill } from "react-icons/go";
 import { AiFillCloseCircle } from "react-icons/ai";
 
 import { Input } from "@/components/ui/input";
-import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import {
   Table,
@@ -16,54 +15,78 @@ import {
   TableRow,
 } from "@/components/ui/table";
 
+import { Context } from "../main";
+
 const Appointments = () => {
   const baseURL = import.meta.env.VITE_API_BASE_URL;
+
+  const { user } = useContext(Context);
+  const role = localStorage.getItem("role");
 
   const [appointments, setAppointments] = useState([]);
   const [search, setSearch] = useState("");
   const [statusFilter, setStatusFilter] = useState("all");
   const [sortOrder, setSortOrder] = useState("latest");
 
-  // 🔹 FETCH
+  /* ================= FETCH ================= */
   useEffect(() => {
     const fetchAppointments = async () => {
       try {
         const { data } = await axios.get(`${baseURL}/api/v1/appointment/all`, {
           withCredentials: true,
         });
+
         setAppointments(data.appointements || []);
       } catch {
-        toast.error("Failed to fetch appointments", { position: "top-right" });
+        toast.error("Failed to fetch appointments");
       }
     };
+
     fetchAppointments();
   }, [baseURL]);
 
-  // 🔹 FILTER + SEARCH + SORT
+  /* ================= FILTER + ROLE ================= */
   const filteredAppointments = useMemo(() => {
-    return appointments
-      .filter((a) => {
-        const q = search.toLowerCase();
-        return (
-          a.firstName.toLowerCase().includes(q) ||
-          a.lastName.toLowerCase().includes(q) ||
-          a.department.toLowerCase().includes(q) ||
-          a.doctor?.firstName?.toLowerCase().includes(q) ||
-          a.doctor?.lastName?.toLowerCase().includes(q)
-        );
-      })
-      .filter((a) =>
-        statusFilter === "all" ? true : a.status === statusFilter,
-      )
-      .sort((a, b) =>
-        sortOrder === "latest"
-          ? new Date(b.appointment_date) - new Date(a.appointment_date)
-          : new Date(a.appointment_date) - new Date(b.appointment_date),
-      );
-  }, [appointments, search, statusFilter, sortOrder]);
+    return (
+      appointments
+        // 🔐 ROLE BASED FILTER
+        .filter((a) => {
+          if (role === "doctor") {
+            return a.doctorId === user?._id;
+          }
+          return true; // admin
+        })
 
-  // 🔹 UPDATE STATUS
+        // 🔍 SEARCH
+        .filter((a) => {
+          const q = search.toLowerCase();
+          return (
+            a.firstName.toLowerCase().includes(q) ||
+            a.lastName.toLowerCase().includes(q) ||
+            a.department.toLowerCase().includes(q) ||
+            a.doctor?.firstName?.toLowerCase().includes(q) ||
+            a.doctor?.lastName?.toLowerCase().includes(q)
+          );
+        })
+
+        // 🏷 STATUS FILTER
+        .filter((a) =>
+          statusFilter === "all" ? true : a.status === statusFilter,
+        )
+
+        // ⏱ SORT
+        .sort((a, b) =>
+          sortOrder === "latest"
+            ? new Date(b.appointment_date) - new Date(a.appointment_date)
+            : new Date(a.appointment_date) - new Date(b.appointment_date),
+        )
+    );
+  }, [appointments, search, statusFilter, sortOrder, role, user]);
+
+  /* ================= UPDATE STATUS (ADMIN ONLY) ================= */
   const handleUpdateStatus = async (id, status) => {
+    if (role !== "admin") return;
+
     try {
       await axios.put(
         `${baseURL}/api/v1/appointment/update/${id}`,
@@ -75,12 +98,13 @@ const Appointments = () => {
         prev.map((a) => (a._id === id ? { ...a, status } : a)),
       );
 
-      toast.success("Appointment updated", { position: "top-right" });
+      toast.success("Appointment updated");
     } catch {
-      toast.error("Failed to update appointment", { position: "top-right" });
+      toast.error("Failed to update appointment");
     }
   };
 
+  /* ================= STATUS BADGE ================= */
   const statusBadge = (status) => {
     switch (status) {
       case "Pending":
@@ -96,23 +120,23 @@ const Appointments = () => {
 
   return (
     <section className="space-y-6 bg-slate-50 p-6 rounded-xl">
-      {/* PAGE HEADER */}
-      <div className="flex items-center justify-between">
-        <h1 className="text-2xl font-bold text-slate-900">Appointments</h1>
-      </div>
+      {/* HEADER */}
+      <h1 className="text-2xl font-bold text-slate-900">
+        {role === "doctor" ? "My Appointments" : "All Appointments"}
+      </h1>
 
-      {/* 🔹 FILTER BAR */}
+      {/* FILTER BAR */}
       <div className="bg-white border rounded-2xl p-5 shadow-sm space-y-4">
         <Input
           placeholder="Search patient, doctor, department..."
           value={search}
           onChange={(e) => setSearch(e.target.value)}
-          className="h-11 border-slate-300 focus:border-blue-600 focus:ring-1 focus:ring-blue-100"
+          className="h-11"
         />
 
         <div className="flex flex-wrap gap-4">
           <select
-            className="h-11 w-48 rounded-lg border border-slate-300 px-3 text-sm text-slate-700 focus:border-blue-600 focus:outline-none"
+            className="h-11 w-48 rounded-lg border px-3 text-sm"
             value={statusFilter}
             onChange={(e) => setStatusFilter(e.target.value)}
           >
@@ -124,7 +148,7 @@ const Appointments = () => {
           </select>
 
           <select
-            className="h-11 w-48 rounded-lg border border-slate-300 px-3 text-sm text-slate-700 focus:border-blue-600 focus:outline-none"
+            className="h-11 w-48 rounded-lg border px-3 text-sm"
             value={sortOrder}
             onChange={(e) => setSortOrder(e.target.value)}
           >
@@ -134,22 +158,20 @@ const Appointments = () => {
         </div>
       </div>
 
-      {/* 🔹 TABLE */}
+      {/* TABLE */}
       <div className="bg-white border rounded-2xl shadow-sm overflow-x-auto">
         <Table>
           <TableHeader className="bg-slate-100">
             <TableRow>
-              <TableHead className="text-slate-700">Patient</TableHead>
-              <TableHead className="text-slate-700">Doctor</TableHead>
-              <TableHead className="text-slate-700">Department</TableHead>
-              <TableHead className="text-slate-700">Date</TableHead>
-              <TableHead className="text-slate-700">Status</TableHead>
-              <TableHead className="text-slate-700 text-center">
-                Visited
-              </TableHead>
-              <TableHead className="text-right text-slate-700">
-                Action
-              </TableHead>
+              <TableHead>Patient</TableHead>
+              {role === "admin" && <TableHead>Doctor</TableHead>}
+              <TableHead>Department</TableHead>
+              <TableHead>Date</TableHead>
+              <TableHead>Status</TableHead>
+              <TableHead className="text-center">Visited</TableHead>
+              {role === "admin" && (
+                <TableHead className="text-right">Action</TableHead>
+              )}
             </TableRow>
           </TableHeader>
 
@@ -157,8 +179,8 @@ const Appointments = () => {
             {filteredAppointments.length === 0 && (
               <TableRow>
                 <TableCell
-                  colSpan={7}
-                  className="text-center text-slate-500 py-10"
+                  colSpan={role === "admin" ? 7 : 6}
+                  className="text-center py-10 text-slate-500"
                 >
                   No appointments found
                 </TableCell>
@@ -166,18 +188,20 @@ const Appointments = () => {
             )}
 
             {filteredAppointments.map((a) => (
-              <TableRow key={a._id} className="hover:bg-slate-50 transition">
-                <TableCell className="font-medium text-slate-900">
+              <TableRow key={a._id}>
+                <TableCell className="font-medium">
                   {a.firstName} {a.lastName}
                 </TableCell>
 
-                <TableCell className="text-slate-700">
-                  Dr. {a.doctor.firstName} {a.doctor.lastName}
-                </TableCell>
+                {role === "admin" && (
+                  <TableCell>
+                    Dr. {a.doctor.firstName} {a.doctor.lastName}
+                  </TableCell>
+                )}
 
-                <TableCell className="text-slate-700">{a.department}</TableCell>
+                <TableCell>{a.department}</TableCell>
 
-                <TableCell className="text-slate-700">
+                <TableCell>
                   {new Date(a.appointment_date).toLocaleDateString()}
                 </TableCell>
 
@@ -191,18 +215,22 @@ const Appointments = () => {
                   )}
                 </TableCell>
 
-                <TableCell className="text-right">
-                  <select
-                    value={a.status}
-                    onChange={(e) => handleUpdateStatus(a._id, e.target.value)}
-                    className="h-9 w-36 rounded-lg border border-slate-300 px-2 text-sm focus:border-blue-600 focus:outline-none"
-                  >
-                    <option value="Pending">Pending</option>
-                    <option value="Confirmed">Confirmed</option>
-                    <option value="Cancelled">Cancelled</option>
-                    <option value="Completed">Completed</option>
-                  </select>
-                </TableCell>
+                {role === "admin" && (
+                  <TableCell className="text-right">
+                    <select
+                      value={a.status}
+                      onChange={(e) =>
+                        handleUpdateStatus(a._id, e.target.value)
+                      }
+                      className="h-9 w-36 rounded-lg border px-2 text-sm"
+                    >
+                      <option value="Pending">Pending</option>
+                      <option value="Confirmed">Confirmed</option>
+                      <option value="Cancelled">Cancelled</option>
+                      <option value="Completed">Completed</option>
+                    </select>
+                  </TableCell>
+                )}
               </TableRow>
             ))}
           </TableBody>

@@ -15,9 +15,9 @@ import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 
-import UserDetailsDialog from "./UserDetailsDialog";
-import UserEditDialog from "./UserEditDialog";
-import DeleteUserDialog from "./DeleteUserDialog";
+import UserDetailsDialog from "../components/UserDetailsDialog";
+import UserEditDialog from "../components/UserEditDialog";
+import DeleteUserDialog from "../components/DeleteUserDialog";
 
 const Users = () => {
   const { isAuthenticated } = useContext(Context);

@@ -3,7 +3,7 @@ export const generateToken = (user, message, statusCode, res) => {
 
   const roleToCookie = {
     admin: "admin_token",
-    user: "user_token",
+    patient: "user_token",
     doctor: "doctor_token",
   };
 

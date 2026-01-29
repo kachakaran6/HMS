@@ -7,15 +7,17 @@ import {
   Navigate,
 } from "react-router-dom";
 
-import Dashboard from "./components/Dashboard";
-import Login from "./components/Login";
-import Message from "./components/Message";
-import AddNewAdmin from "./components/AddNewAdmin";
-import AddNewDoctor from "./components/AddNewDoctor";
-import Doctor from "./components/Doctor";
-import Appointments from "./components/Appointments";
+import Dashboard from "./pages/Dashboard";
+import Login from "./pages/Login";
+import Message from "./pages/Message";
+import AddNewAdmin from "./pages/AddNewAdmin";
+import AddNewDoctor from "./pages/AddNewDoctor";
+import Doctor from "./pages/Doctor";
+import Appointments from "./pages/Appointments";
 import DashboardLayout from "./layouts/DashboardLayout";
 import { Spinner } from "@/components/ui/spinner";
+import ProtectedRoute from "./components/ProtectedRoute";
+import RoleRoute from "./components/RoleRoute";
 
 import { ToastContainer } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
@@ -23,7 +25,7 @@ import "react-toastify/dist/ReactToastify.css";
 import { Context } from "./main";
 import axios from "axios";
 import "./App.css";
-import Users from "./components/Users";
+import Users from "./pages/Users";
 import { Toaster } from "sonner";
 import ForgotPassword from "./components/ForgotPassword";
 import NotFound from "./components/NotFound";
@@ -66,7 +68,7 @@ const App = () => {
   if (loading) {
     return (
       <div className="flex items-center justify-center min-h-screen bg-gray-50">
-        <Spinner className="h-8 w-8 text-blue-600" />
+        <Spinner className="h-8 w-8 text-blue-500" />
       </div>
     );
   }
@@ -74,27 +76,31 @@ const App = () => {
   return (
     <Router>
       <Routes>
-        {/* Public Route */}
+        {/* ================= PUBLIC ================= */}
         <Route
           path="/login"
           element={!isAuthenticated ? <Login /> : <Navigate to="/" />}
         />
         <Route path="/forgot-password" element={<ForgotPassword />} />
 
-        {/* Protected Routes */}
-        <Route
-          element={
-            isAuthenticated ? <DashboardLayout /> : <Navigate to="/login" />
-          }
-        >
-          <Route path="/" element={<Dashboard />} />
-          <Route path="/doctors" element={<Doctor />} />
-          <Route path="/users" element={<Users />} />
-          <Route path="/appointments" element={<Appointments />} />
-          <Route path="/doctor/addnew" element={<AddNewDoctor />} />
-          <Route path="/admin/addnew" element={<AddNewAdmin />} />
-          <Route path="/messages" element={<Message />} />
-          <Route path="*" element={<NotFound />} />
+        {/* ================= AUTH REQUIRED ================= */}
+        <Route element={<ProtectedRoute isAuthenticated={isAuthenticated} />}>
+          <Route element={<DashboardLayout />}>
+            <Route path="/" element={<Dashboard />} />
+            <Route path="/doctors" element={<Doctor />} />
+            <Route path="/appointments" element={<Appointments />} />
+            <Route path="/messages" element={<Message />} />
+
+            {/* ================= ADMIN ONLY ================= */}
+            <Route element={<RoleRoute allowedRoles={["admin"]} />}>
+              <Route path="/users" element={<Users />} />
+              <Route path="/admin/addnew" element={<AddNewAdmin />} />
+              <Route path="/doctor/addnew" element={<AddNewDoctor />} />
+            </Route>
+
+            {/* ================= 404 ================= */}
+            <Route path="*" element={<NotFound />} />
+          </Route>
         </Route>
       </Routes>
 
