@@ -1,6 +1,6 @@
 import React, { useState, useContext, useEffect } from "react";
 import { Context } from "../main";
-import { toast } from "react-toastify";
+import { toast } from "sonner";
 import axios from "axios";
 import { useNavigate } from "react-router-dom";
 import {
@@ -27,7 +27,9 @@ const Login = () => {
     e.preventDefault();
 
     if (password !== confirmPassword) {
-      toast.error("Password and Confirm Password must match");
+      toast.error("Password and Confirm Password must match", {
+        position: "top-right",
+      });
       return;
     }
 
@@ -51,7 +53,9 @@ const Login = () => {
       setIsAuthenticated(true);
       navigateTo("/");
     } catch (error) {
-      toast.error(error.response?.data?.message || "Login failed");
+      toast.error(error.response?.data?.message || "Login failed", {
+        position: "top-right",
+      });
     }
   };
 
@@ -60,28 +64,25 @@ const Login = () => {
   }, [isAuthenticated, navigateTo]);
 
   return (
-    <section className="min-h-[100svh] flex items-center justify-center bg-slate-100 px-6">
-      <div className="w-full max-w-md bg-white rounded-2xl shadow-xl border border-slate-200 p-8">
-        {/* Logo / Brand */}
-        <div className="flex items-center justify-center mb-6">
-          <div className="w-12 h-12 rounded-xl bg-gradient-to-br from-blue-600 to-teal-500 flex items-center justify-center text-white font-bold text-xl">
-            A
+    <section className="min-h-[100svh] flex items-center justify-center bg-slate-50 px-4">
+      <div className="w-full max-w-sm bg-white rounded-xl border shadow-sm p-6">
+        {/* HEADER */}
+        <div className="mb-4 text-center">
+          <div className="mx-auto mb-2 w-10 h-10 rounded-lg bg-blue-600 flex items-center justify-center text-white font-bold text-sm">
+            HMS
           </div>
+
+          <h1 className="text-lg font-semibold text-slate-900">Admin Login</h1>
+
+          <p className="text-xs text-slate-500">Authorized access only</p>
         </div>
 
-        <h1 className="text-2xl font-bold text-slate-900 text-center">
-          Admin Login
-        </h1>
-
-        <p className="mt-2 text-center text-slate-600 text-sm">
-          Only administrators are allowed to access this panel
-        </p>
-
-        <form onSubmit={handleLogin} className="mt-8 space-y-5">
+        {/* FORM */}
+        <form onSubmit={handleLogin} className="space-y-3">
           <input
             type="email"
-            placeholder="Admin Email"
-            className="input"
+            placeholder="Email"
+            className="w-full h-10 rounded-lg border border-slate-300 px-3 text-sm focus:border-blue-600 focus:outline-none"
             value={email}
             onChange={(e) => setEmail(e.target.value)}
             required
@@ -90,47 +91,54 @@ const Login = () => {
           <input
             type="password"
             placeholder="Password"
-            className="input"
+            className="w-full h-10 rounded-lg border border-slate-300 px-3 text-sm focus:border-blue-600 focus:outline-none"
             value={password}
             onChange={(e) => setPassword(e.target.value)}
             required
           />
 
-          {/* Required because backend needs it */}
+          {/* Backend requirement */}
           <input
             type="password"
             placeholder="Confirm Password"
-            className="input"
+            className="w-full h-10 rounded-lg border border-slate-300 px-3 text-sm focus:border-blue-600 focus:outline-none"
             value={confirmPassword}
             onChange={(e) => setConfirmPassword(e.target.value)}
             required
           />
 
           <Select value={role} onValueChange={setRole}>
-            <SelectTrigger className="w-[40%] rounded-xl">
+            <SelectTrigger className="h-10 rounded-lg text-sm">
               <SelectValue placeholder="Login as" />
             </SelectTrigger>
 
-            <SelectContent className="bg-white border shadow-lg rounded-xl">
+            <SelectContent className="bg-white border shadow-md rounded-lg">
               <SelectItem value="admin">
                 <div className="flex items-center gap-2">
-                  <Shield size={16} /> Admin
+                  <Shield size={14} /> Admin
                 </div>
               </SelectItem>
 
               <SelectItem value="doctor">
                 <div className="flex items-center gap-2">
-                  <Stethoscope size={16} /> Doctor
+                  <Stethoscope size={14} /> Doctor
                 </div>
               </SelectItem>
             </SelectContent>
           </Select>
 
+          <a
+            href="/forgot-password"
+            className="text-sm text-blue-600 hover:underline"
+          >
+            Forgot Password?
+          </a>
+
           <button
             type="submit"
-            className="w-full py-3 rounded-xl bg-gradient-to-r from-blue-600 to-teal-500 text-white font-medium hover:opacity-90 transition"
+            className="w-full h-10 rounded-lg bg-blue-600 text-white text-sm font-medium hover:bg-blue-700 transition"
           >
-            Login to Dashboard
+            Login
           </button>
         </form>
       </div>

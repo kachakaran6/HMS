@@ -15,6 +15,7 @@ import AddNewDoctor from "./components/AddNewDoctor";
 import Doctor from "./components/Doctor";
 import Appointments from "./components/Appointments";
 import DashboardLayout from "./layouts/DashboardLayout";
+import { Spinner } from "@/components/ui/spinner";
 
 import { ToastContainer } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
@@ -24,6 +25,8 @@ import axios from "axios";
 import "./App.css";
 import Users from "./components/Users";
 import { Toaster } from "sonner";
+import ForgotPassword from "./components/ForgotPassword";
+import NotFound from "./components/NotFound";
 
 const App = () => {
   const { isAuthenticated, setIsAuthenticated, setUser } = useContext(Context);
@@ -62,7 +65,9 @@ const App = () => {
   // 🔥 WAIT until auth check finishes
   if (loading) {
     return (
-      <div style={{ textAlign: "center", marginTop: "50px" }}>Loading...</div>
+      <div className="flex items-center justify-center min-h-screen bg-gray-50">
+        <Spinner className="h-8 w-8 text-blue-600" />
+      </div>
     );
   }
 
@@ -74,6 +79,7 @@ const App = () => {
           path="/login"
           element={!isAuthenticated ? <Login /> : <Navigate to="/" />}
         />
+        <Route path="/forgot-password" element={<ForgotPassword />} />
 
         {/* Protected Routes */}
         <Route
@@ -88,6 +94,7 @@ const App = () => {
           <Route path="/doctor/addnew" element={<AddNewDoctor />} />
           <Route path="/admin/addnew" element={<AddNewAdmin />} />
           <Route path="/messages" element={<Message />} />
+          <Route path="*" element={<NotFound />} />
         </Route>
       </Routes>
 

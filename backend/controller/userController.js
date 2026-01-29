@@ -343,3 +343,49 @@ export const deleteDoctor = catchAsyncErros(async (req, res, next) => {
     message: "Doctor Deleted Successfully",
   });
 });
+export const updateUser = catchAsyncErros(async (req, res, next) => {
+  const { id } = req.params;
+
+  const updates = req.body;
+  if (Object.keys(updates).length === 0) {
+    return next(new ErrorHandler("No fields provided to update", 400));
+  }
+
+  const user = await User.findOne({ _id: id });
+  if (!user) {
+    return next(new ErrorHandler("User Not Found!", 404));
+  }
+
+  // Prevent duplicate email
+  if (updates.email && updates.email !== user.email) {
+    const emailExists = await User.findOne({ email: updates.email });
+    if (emailExists) {
+      return next(new ErrorHandler("Email already in use", 400));
+    }
+  }
+
+  Object.assign(user, updates);
+  await user.save();
+
+  res.status(200).json({
+    success: true,
+    message: "User Details Updated Successfully",
+    user,
+  });
+});
+
+export const deleteUser = catchAsyncErros(async (req, res, next) => {
+  const { id } = req.params;
+
+  const user = await User.findOne({ _id: id });
+  if (!user) {
+    return next(new ErrorHandler("User Not Found!", 404));
+  }
+
+  await user.deleteOne();
+
+  res.status(200).json({
+    success: true,
+    message: "User Deleted Successfully",
+  });
+});

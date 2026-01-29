@@ -28,46 +28,47 @@ const Message = () => {
     return <Navigate to="/login" />;
   }
   return (
-    <section className="space-y-6">
-      <h1 className="text-2xl font-bold text-slate-900">Messages</h1>
+    <section className="space-y-6 bg-slate-50 p-6 rounded-xl">
+      {/* PAGE HEADER */}
+      <div className="flex items-center justify-between">
+        <h1 className="text-2xl font-bold text-slate-900">Messages</h1>
+      </div>
 
       {messages && messages.length > 0 ? (
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
           {messages.map((element) => (
             <div
               key={element._id}
-              className="bg-white rounded-2xl shadow p-6 flex flex-col justify-between"
+              className="bg-white rounded-2xl border shadow-sm hover:shadow-md transition flex flex-col"
             >
-              <div className="space-y-2 text-sm">
-                <p>
-                  <span className="font-medium text-slate-700">
-                    First Name:
-                  </span>{" "}
-                  {element.firstName}
+              {/* SENDER HEADER */}
+              <div className="px-5 py-4 border-b bg-slate-50 rounded-t-2xl">
+                <p className="font-semibold text-slate-900">
+                  {element.firstName} {element.lastName}
                 </p>
-                <p>
-                  <span className="font-medium text-slate-700">Last Name:</span>{" "}
-                  {element.lastName}
-                </p>
-                <p>
-                  <span className="font-medium text-slate-700">Email:</span>{" "}
-                  {element.email}
-                </p>
-                <p>
-                  <span className="font-medium text-slate-700">Phone:</span>{" "}
-                  {element.phone}
+                <p className="text-xs text-slate-500">
+                  {element.email} · {element.phone}
                 </p>
               </div>
 
-              {/* Message body */}
-              <div className="mt-4 p-4 rounded-xl bg-slate-50 text-slate-700 text-sm leading-relaxed">
-                {element.message}
+              {/* MESSAGE BODY */}
+              <div className="p-5 flex-1">
+                <p className="text-sm text-slate-700 leading-relaxed">
+                  {element.message}
+                </p>
+              </div>
+
+              {/* FOOTER (optional future actions) */}
+              <div className="px-5 py-3 border-t bg-white text-xs text-slate-500">
+                Message received
               </div>
             </div>
           ))}
         </div>
       ) : (
-        <p className="text-slate-500">No messages found</p>
+        <div className="bg-white border rounded-2xl p-8 text-center text-slate-500">
+          No messages found
+        </div>
       )}
     </section>
   );

@@ -1,4 +1,4 @@
-import { useContext, useState } from "react";
+import { useContext } from "react";
 import { NavLink, useNavigate } from "react-router-dom";
 import { Context } from "../main";
 import axios from "axios";
@@ -34,89 +34,152 @@ const SideBar = ({ onLinkClick }) => {
     }
   };
 
-  const linkClass =
-    "flex items-center gap-3 px-4 py-3 rounded-xl text-slate-700 hover:bg-slate-200 transition";
-
-  const activeClass = "bg-blue-600 text-white hover:bg-blue-600";
-
   return (
-    <aside className="w-64 min-h-screen bg-white border-r border-slate-200 flex flex-col">
-      {/* Logo */}
-      <div className="p-4 border-b">
-        <h2 className="text-xl font-bold text-slate-900">HMS Admin</h2>
+    <aside className="fixed md:static inset-y-0 left-0 z-40 w-64 bg-white border-r border-slate-200 flex flex-col h-screen">
+      {/* LOGO */}
+      {/* SIDEBAR HEADER */}
+      <div className="h-16 px-5 flex flex-col justify-center border-b">
+        <h2 className="text-xl font-bold text-blue-600 leading-tight">
+          HMS Admin
+        </h2>
+        {/* <p className="text-xs text-slate-500 leading-tight">
+          Hospital Management System
+        </p> */}
       </div>
 
-      {/* Nav */}
-      <nav className="flex-1 overflow-y-auto p-4 space-y-2">
+      {/* NAVIGATION (SCROLLABLE) */}
+      <nav className="flex-1 overflow-y-auto px-3 py-4 space-y-1">
         <NavLink
           to="/"
           end
           className={({ isActive }) =>
-            `${linkClass} ${isActive ? activeClass : ""}`
+            `flex items-center gap-3 px-4 py-3 rounded-xl text-sm transition
+          ${
+            isActive
+              ? "bg-blue-600 text-white shadow"
+              : "text-slate-700 hover:bg-slate-100"
+          }`
           }
           onClick={onLinkClick}
         >
-          <TiHome /> Dashboard
+          <TiHome className="text-lg" />
+          Dashboard
         </NavLink>
 
         <NavLink
           to="/doctors"
           className={({ isActive }) =>
-            `${linkClass} ${isActive ? activeClass : ""}`
+            `flex items-center gap-3 px-4 py-3 rounded-xl text-sm transition
+          ${
+            isActive
+              ? "bg-blue-600 text-white shadow"
+              : "text-slate-700 hover:bg-slate-100"
+          }`
           }
           onClick={onLinkClick}
         >
-          <FaUserMd /> Doctors
+          <FaUserMd className="text-lg" />
+          Doctors
         </NavLink>
 
         <NavLink
           to="/appointments"
           className={({ isActive }) =>
-            `${linkClass} ${isActive ? activeClass : ""}`
+            `flex items-center gap-3 px-4 py-3 rounded-xl text-sm transition
+          ${
+            isActive
+              ? "bg-blue-600 text-white shadow"
+              : "text-slate-700 hover:bg-slate-100"
+          }`
           }
           onClick={onLinkClick}
         >
-          <FaCalendarCheck /> Appointments
+          <FaCalendarCheck className="text-lg" />
+          Appointments
         </NavLink>
 
         {/* ADMIN ONLY */}
         {role === "admin" && (
           <>
-            <NavLink to="/users" className={linkClass}>
-              <FaUser /> All Users
-            </NavLink>
-            <NavLink to="/admin/addnew" className={linkClass}>
-              <MdAddModerator /> Add Admin
+            <div className="mt-4 mb-2 px-4 text-xs uppercase tracking-wide text-slate-400">
+              Administration
+            </div>
+
+            <NavLink
+              to="/users"
+              className={({ isActive }) =>
+                `flex items-center gap-3 px-4 py-3 rounded-xl text-sm transition
+              ${
+                isActive
+                  ? "bg-blue-600 text-white shadow"
+                  : "text-slate-700 hover:bg-slate-100"
+              }`
+              }
+              onClick={onLinkClick}
+            >
+              <FaUser className="text-lg" />
+              All Users
             </NavLink>
 
-            <NavLink to="/doctor/addnew" className={linkClass}>
-              <IoPersonAddSharp /> Add Doctor
+            <NavLink
+              to="/admin/addnew"
+              className={({ isActive }) =>
+                `flex items-center gap-3 px-4 py-3 rounded-xl text-sm transition
+              ${
+                isActive
+                  ? "bg-blue-600 text-white shadow"
+                  : "text-slate-700 hover:bg-slate-100"
+              }`
+              }
+              onClick={onLinkClick}
+            >
+              <MdAddModerator className="text-lg" />
+              Add Admin
             </NavLink>
 
-            <NavLink to="/messages" className={linkClass}>
-              <AiFillMessage /> Messages
+            <NavLink
+              to="/doctor/addnew"
+              className={({ isActive }) =>
+                `flex items-center gap-3 px-4 py-3 rounded-xl text-sm transition
+              ${
+                isActive
+                  ? "bg-blue-600 text-white shadow"
+                  : "text-slate-700 hover:bg-slate-100"
+              }`
+              }
+              onClick={onLinkClick}
+            >
+              <IoPersonAddSharp className="text-lg" />
+              Add Doctor
+            </NavLink>
+
+            <NavLink
+              to="/messages"
+              className={({ isActive }) =>
+                `flex items-center gap-3 px-4 py-3 rounded-xl text-sm transition
+              ${
+                isActive
+                  ? "bg-blue-600 text-white shadow"
+                  : "text-slate-700 hover:bg-slate-100"
+              }`
+              }
+              onClick={onLinkClick}
+            >
+              <AiFillMessage className="text-lg" />
+              Messages
             </NavLink>
           </>
         )}
-
-        {/* <NavLink
-          to="/messages"
-          className={({ isActive }) =>
-            `${linkClass} ${isActive ? activeClass : ""}`
-          }
-          onClick={onLinkClick}
-        >
-          <AiFillMessage /> Messages
-        </NavLink> */}
       </nav>
 
-      {/* Logout */}
-      <div className="p-4 border-t">
+      {/* LOGOUT (ALWAYS VISIBLE) */}
+      <div className="px-4 py-4 border-t bg-white">
         <button
           onClick={handleLogout}
-          className="w-full flex items-center gap-3 px-4 py-3 rounded-xl text-red-600 hover:bg-red-50 transition"
+          className="w-full flex items-center gap-3 px-4 py-3 rounded-xl text-sm font-medium text-red-600 hover:bg-red-50 transition"
         >
-          <RiLogoutBoxFill /> Logout
+          <RiLogoutBoxFill className="text-lg" />
+          Logout
         </button>
       </div>
     </aside>

@@ -53,94 +53,143 @@ const AddNewAdmin = () => {
   }
 
   return (
-    <section className="space-y-6">
-      <div className="max-w-2xl bg-white rounded-2xl shadow p-8">
-        <h2 className="text-2xl font-bold text-slate-900">Add Admin</h2>
+    <section className="bg-slate-50 p-6 rounded-xl">
+      <div className="max-w-2xl bg-white rounded-2xl border shadow-sm p-8">
+        {/* HEADER */}
+        <div className="mb-6">
+          <h2 className="text-2xl font-bold text-slate-900">
+            Add Administrator
+          </h2>
+          <p className="mt-1 text-sm text-slate-600">
+            Enter details to create a new admin account
+          </p>
+        </div>
 
-        <p className="mt-1 text-slate-600">
-          Please enter details of the new administrator
-        </p>
+        <form onSubmit={handleAddNew} className="space-y-6">
+          {/* ================= BASIC INFO ================= */}
+          <section className="space-y-4">
+            <h3 className="text-sm font-semibold text-blue-600 uppercase tracking-wide">
+              Basic Information
+            </h3>
 
-        <form onSubmit={handleAddNew} className="mt-6 space-y-5">
-          {/* Name */}
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-            <input
-              type="text"
-              placeholder="First Name"
-              className="input"
-              value={firstName}
-              onChange={(e) => setFirstName(e.target.value)}
-            />
-            <input
-              type="text"
-              placeholder="Last Name"
-              className="input"
-              value={lastName}
-              onChange={(e) => setLastName(e.target.value)}
-            />
-          </div>
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+              <div>
+                <label className="text-sm text-slate-700">First Name</label>
+                <input
+                  type="text"
+                  className="mt-1 w-full h-11 rounded-lg border border-slate-300 px-3 focus:border-blue-600 focus:outline-none"
+                  value={firstName}
+                  onChange={(e) => setFirstName(e.target.value)}
+                />
+              </div>
 
-          {/* Email & Phone */}
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-            <input
-              type="email"
-              placeholder="Email"
-              className="input"
-              value={email}
-              onChange={(e) => setEmail(e.target.value)}
-            />
-            <input
-              type="tel"
-              placeholder="Phone Number"
-              className="input"
-              value={phone}
-              onChange={(e) => setPhone(e.target.value)}
-            />
-          </div>
+              <div>
+                <label className="text-sm text-slate-700">Last Name</label>
+                <input
+                  type="text"
+                  className="mt-1 w-full h-11 rounded-lg border border-slate-300 px-3 focus:border-blue-600 focus:outline-none"
+                  value={lastName}
+                  onChange={(e) => setLastName(e.target.value)}
+                />
+              </div>
+            </div>
+          </section>
 
-          {/* Patient ID & DOB */}
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-            <input
-              type="text"
-              placeholder="Patient ID"
-              className="input"
-              value={patientId}
-              onChange={(e) => setPatientId(e.target.value)}
-            />
-            <input
-              type="date"
-              className="input"
-              value={dob}
-              onChange={(e) => setDob(e.target.value)}
-            />
-          </div>
+          {/* ================= CONTACT ================= */}
+          <section className="space-y-4">
+            <h3 className="text-sm font-semibold text-blue-600 uppercase tracking-wide">
+              Contact Details
+            </h3>
 
-          {/* Gender & Password */}
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-            <select
-              className="input"
-              value={gender}
-              onChange={(e) => setGender(e.target.value)}
-            >
-              <option value="">Select Gender</option>
-              <option value="Male">Male</option>
-              <option value="Female">Female</option>
-            </select>
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+              <div>
+                <label className="text-sm text-slate-700">Email Address</label>
+                <input
+                  type="email"
+                  className="mt-1 w-full h-11 rounded-lg border border-slate-300 px-3 focus:border-blue-600 focus:outline-none"
+                  value={email}
+                  onChange={(e) => setEmail(e.target.value)}
+                />
+              </div>
 
-            <input
-              type="password"
-              placeholder="Password"
-              className="input"
-              value={password}
-              onChange={(e) => setPassword(e.target.value)}
-            />
-          </div>
+              <div>
+                <label className="text-sm text-slate-700">Phone Number</label>
+                <input
+                  type="tel"
+                  className="mt-1 w-full h-11 rounded-lg border border-slate-300 px-3 focus:border-blue-600 focus:outline-none"
+                  value={phone}
+                  onChange={(e) => setPhone(e.target.value)}
+                />
+              </div>
+            </div>
+          </section>
 
-          {/* Submit */}
-          <div className="pt-4">
+          {/* ================= ID & PERSONAL ================= */}
+          <section className="space-y-4">
+            <h3 className="text-sm font-semibold text-blue-600 uppercase tracking-wide">
+              Personal Details
+            </h3>
+
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+              <div>
+                <label className="text-sm text-slate-700">Patient ID</label>
+                <input
+                  type="text"
+                  className="mt-1 w-full h-11 rounded-lg border border-slate-300 px-3 focus:border-blue-600 focus:outline-none"
+                  value={patientId}
+                  onChange={(e) => setPatientId(e.target.value)}
+                />
+              </div>
+
+              <div>
+                <label className="text-sm text-slate-700">Date of Birth</label>
+                <input
+                  type="date"
+                  className="mt-1 w-full h-11 rounded-lg border border-slate-300 px-3 focus:border-blue-600 focus:outline-none"
+                  value={dob}
+                  onChange={(e) => setDob(e.target.value)}
+                />
+              </div>
+            </div>
+          </section>
+
+          {/* ================= SECURITY ================= */}
+          <section className="space-y-4">
+            <h3 className="text-sm font-semibold text-blue-600 uppercase tracking-wide">
+              Security
+            </h3>
+
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+              <div>
+                <label className="text-sm text-slate-700">Gender</label>
+                <select
+                  className="mt-1 w-full h-11 rounded-lg border border-slate-300 px-3 focus:border-blue-600 focus:outline-none"
+                  value={gender}
+                  onChange={(e) => setGender(e.target.value)}
+                >
+                  <option value="">Select Gender</option>
+                  <option value="Male">Male</option>
+                  <option value="Female">Female</option>
+                </select>
+              </div>
+
+              <div>
+                <label className="text-sm text-slate-700">Password</label>
+                <input
+                  type="password"
+                  className="mt-1 w-full h-11 rounded-lg border border-slate-300 px-3 focus:border-blue-600 focus:outline-none"
+                  value={password}
+                  onChange={(e) => setPassword(e.target.value)}
+                />
+              </div>
+            </div>
+          </section>
+
+          {/* ================= SUBMIT ================= */}
+          <div className="pt-6 border-t flex justify-end">
             <button
               type="submit"
-              className="w-full md:w-auto px-8 py-3 rounded-xl bg-gradient-to-r from-blue-600 to-teal-500 text-white font-medium hover:opacity-90 transition"
+              className="px-8 py-3 rounded-xl bg-blue-600 text-white font-medium hover:bg-blue-700 transition"
             >
               Register Admin
             </button>

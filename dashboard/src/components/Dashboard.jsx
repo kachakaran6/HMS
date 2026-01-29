@@ -82,135 +82,137 @@ const Dashboard = () => {
   }
 
   return (
-    <section className="space-y-8">
-      {/* 🔹 TOP SECTION */}
+    <section className="space-y-8 bg-slate-50 p-6 rounded-xl">
+      {/* ================= TOP SECTION ================= */}
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-        {/* First Box */}
-        <div className="lg:col-span-2 bg-white rounded-2xl shadow p-6 flex flex-col sm:flex-row gap-6">
-          <img
-            src="/doc.png"
-            alt="dashboard"
-            className="w-28 h-28 object-contain"
-          />
+        {/* WELCOME CARD */}
+        <div className="lg:col-span-2 bg-white rounded-2xl border shadow-sm p-6 flex flex-col sm:flex-row gap-6">
+          <div className="flex-shrink-0 bg-blue-50 rounded-xl p-4">
+            <img
+              src="/doc.png"
+              alt="dashboard"
+              className="w-20 h-20 object-contain"
+            />
+          </div>
 
-          <div className="space-y-2">
+          <div className="space-y-3">
             <div>
-              <p className="text-slate-500">Hello,</p>
+              <p className="text-slate-500 text-sm">Welcome back,</p>
               {user && (
-                <h5 className="text-xl font-semibold text-slate-900">
+                <h5 className="text-2xl font-semibold text-slate-900">
                   {user.role === "doctor" ? "Dr." : "Admin"} {user.firstName}
                 </h5>
               )}
             </div>
 
             <p className="text-slate-600 max-w-xl">
-              Welcome to the Hospital Management System Dashboard. Manage
-              doctors, patients, appointments and messages from here.
+              This is your hospital dashboard. Monitor doctors, appointments,
+              and patient activity from one secure place.
             </p>
           </div>
         </div>
 
-        {/* Second Box */}
-        <div className="bg-white rounded-2xl shadow p-6">
-          <p className="text-slate-500">Total Doctors</p>
-          <h3 className="text-3xl font-bold text-slate-900">{totalDoctors}</h3>
+        {/* KPI: DOCTORS */}
+        <div className="bg-white rounded-2xl border shadow-sm p-6">
+          <p className="text-slate-500 text-sm">Total Doctors</p>
+          <h3 className="mt-2 text-3xl font-bold text-blue-600">
+            {totalDoctors}
+          </h3>
+          <p className="mt-1 text-xs text-slate-400">
+            Active registered doctors
+          </p>
         </div>
 
-        {/* Third Box */}
-        <div className="bg-white rounded-2xl shadow p-6">
-          <p className="text-slate-500">Total Appointments</p>
-          <h3 className="text-3xl font-bold text-slate-900">
+        {/* KPI: APPOINTMENTS */}
+        <div className="bg-white rounded-2xl border shadow-sm p-6">
+          <p className="text-slate-500 text-sm">Total Appointments</p>
+          <h3 className="mt-2 text-3xl font-bold text-blue-600">
             {totalAppointments}
           </h3>
+          <p className="mt-1 text-xs text-slate-400">Scheduled appointments</p>
         </div>
       </div>
 
-      {/* 🔹 RECENT APPOINTMENTS */}
-      <div className="bg-white rounded-2xl shadow p-6">
-        <h5 className="text-lg font-semibold mb-4">Recent Appointments</h5>
+      {/* ================= RECENT APPOINTMENTS ================= */}
+      <div className="bg-white rounded-2xl border shadow-sm p-6">
+        <div className="flex items-center justify-between mb-4">
+          <h5 className="text-lg font-semibold text-slate-900">
+            Recent Appointments
+          </h5>
+          <span className="text-sm text-slate-500">Last 5 entries</span>
+        </div>
 
         <div className="overflow-x-auto">
           <table className="min-w-full text-sm">
             <thead>
-              <tr className="border-b text-left text-slate-500">
-                <th className="py-3">Patient</th>
-                <th className="py-3">Doctor</th>
-                <th className="py-3">Date</th>
-                <th className="py-3">Department</th>
-                <th className="py-3">Status</th>
-                <th className="py-3">Visited</th>
+              <tr className="border-b bg-slate-50 text-left text-slate-600">
+                <th className="py-3 px-2">Patient</th>
+                <th className="py-3 px-2">Doctor</th>
+                <th className="py-3 px-2">Date</th>
+                <th className="py-3 px-2">Department</th>
+                <th className="py-3 px-2">Status</th>
+                <th className="py-3 px-2 text-center">Visited</th>
               </tr>
             </thead>
 
             <tbody>
               {appointments && appointments.length > 0 ? (
-                appointments.slice(0, 5).map((appointment) => {
-                  // const statusText = appointment.hasVisited
-                  //   ? "Accepted"
-                  //   : "Pending";
+                appointments.slice(0, 5).map((appointment) => (
+                  <tr
+                    key={appointment._id}
+                    className="border-b last:border-none hover:bg-slate-50 transition"
+                  >
+                    <td className="py-3 px-2 font-medium text-slate-900">
+                      {appointment.firstName} {appointment.lastName}
+                    </td>
 
-                  // const statusClass = appointment.hasVisited
-                  //   ? "value-accepted"
-                  //   : "value-pending";
+                    <td className="py-3 px-2 text-slate-700">
+                      Dr. {appointment.doctor.firstName}{" "}
+                      {appointment.doctor.lastName}
+                    </td>
 
-                  return (
-                    <tr
-                      key={appointment._id}
-                      className="border-b last:border-none"
-                    >
-                      <td className="py-3">
-                        {appointment.firstName} {appointment.lastName}
-                      </td>
+                    <td className="py-3 px-2 text-slate-700">
+                      {new Date(
+                        appointment.appointment_date,
+                      ).toLocaleDateString()}
+                    </td>
 
-                      <td className="py-3">
-                        Dr. {appointment.doctor.firstName}{" "}
-                        {appointment.doctor.lastName}
-                      </td>
+                    <td className="py-3 px-2 text-slate-700">
+                      {appointment.department}
+                    </td>
 
-                      <td className="py-3">
-                        {new Date(
-                          appointment.appointment_date,
-                        ).toLocaleDateString()}
-                      </td>
+                    <td className="py-3 px-2">
+                      <select
+                        value={appointment.status}
+                        onChange={(e) =>
+                          handleUpdateStatus(appointment._id, e.target.value)
+                        }
+                        className={`h-9 rounded-lg px-3 text-sm border focus:outline-none
+                        ${
+                          appointment.status === "Pending"
+                            ? "bg-yellow-50 text-yellow-700 border-yellow-300"
+                            : appointment.status === "Cancelled"
+                              ? "bg-red-50 text-red-700 border-red-300"
+                              : "bg-green-50 text-green-700 border-green-300"
+                        }
+                      `}
+                      >
+                        <option value="Pending">Pending</option>
+                        <option value="Confirmed">Confirmed</option>
+                        <option value="Cancelled">Cancelled</option>
+                        <option value="Completed">Completed</option>
+                      </select>
+                    </td>
 
-                      <td className="py-3">{appointment.department}</td>
-
-                      <td className="py-3">
-                        <select
-                          className={`
-                          px-3 py-1 rounded-lg text-sm border
-                          ${
-                            appointment.status === "Pending"
-                              ? "bg-yellow-50 text-yellow-700 border-yellow-300"
-                              : appointment.status === "Cancelled"
-                                ? "bg-red-50 text-red-700 border-red-300"
-                                : "bg-green-50 text-green-700 border-green-300"
-                          }
-                        `}
-                          value={appointment.status}
-                          onChange={(e) =>
-                            handleUpdateStatus(appointment._id, e.target.value)
-                          }
-                        >
-                          <option value="Pending">Pending</option>
-                          <option value="Confirmed">Confirmed</option>
-                          <option value="Cancelled">Cancelled</option>
-                          <option value="Completed">Completed</option>
-                        </select>
-                      </td>
-
-                      {/* <td className={statusClass}>{statusText}</td> */}
-                      {/* <td>{appointment.hasVisited ? "Yes" : "No"}</td> */}
-                      <td className="py-3 text-xl">
-                        {appointment.hasVisited === true ? (
-                          <GoCheckCircleFill className="text-green-600" />
-                        ) : (
-                          <AiFillCloseCircle className="text-red-500" />
-                        )}
-                      </td>
-                    </tr>
-                  );
-                })
+                    <td className="py-3 px-2 text-center text-xl">
+                      {appointment.hasVisited ? (
+                        <GoCheckCircleFill className="text-green-600" />
+                      ) : (
+                        <AiFillCloseCircle className="text-red-500" />
+                      )}
+                    </td>
+                  </tr>
+                ))
               ) : (
                 <tr>
                   <td colSpan="6" className="py-6 text-center text-slate-500">

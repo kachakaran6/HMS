@@ -58,20 +58,23 @@ const Users = () => {
   }, [users, search, roleFilter]);
 
   return (
-    <section className="space-y-6">
-      <h1 className="text-2xl font-bold">Users</h1>
+    <section className="space-y-6 bg-slate-50 p-6 rounded-xl">
+      {/* PAGE HEADER */}
+      <div className="flex items-center justify-between">
+        <h1 className="text-2xl font-bold text-slate-900">Users</h1>
+      </div>
 
       {/* TOP BAR */}
-      <div className="flex flex-wrap gap-4 items-center">
+      <div className="flex flex-wrap gap-4 items-center bg-white p-4 rounded-xl border">
         <Input
           placeholder="Search name, email, phone..."
-          className="max-w-sm"
+          className="max-w-sm h-11 border-slate-300 focus:border-blue-600 focus:ring-1 focus:ring-blue-100"
           value={search}
           onChange={(e) => setSearch(e.target.value)}
         />
 
         <select
-          className="border rounded-md px-3 py-2 text-sm"
+          className="h-11 rounded-lg border border-slate-300 px-3 text-sm text-slate-700 focus:border-blue-600 focus:outline-none"
           value={roleFilter}
           onChange={(e) => setRoleFilter(e.target.value)}
         >
@@ -83,61 +86,78 @@ const Users = () => {
       </div>
 
       {/* TABLE */}
-      <div className="rounded-xl border bg-white">
+      <div className="rounded-xl border bg-white overflow-hidden">
         <Table>
-          <TableHeader>
+          <TableHeader className="bg-slate-100">
             <TableRow>
-              <TableHead>Name</TableHead>
-              <TableHead>Role</TableHead>
-              <TableHead>Email</TableHead>
-              <TableHead>Phone</TableHead>
-              <TableHead className="text-right">Actions</TableHead>
+              <TableHead className="text-slate-700">Name</TableHead>
+              <TableHead className="text-slate-700">Role</TableHead>
+              <TableHead className="text-slate-700">Email</TableHead>
+              <TableHead className="text-slate-700">Phone</TableHead>
+              <TableHead className="text-right text-slate-700">
+                Actions
+              </TableHead>
             </TableRow>
           </TableHeader>
 
           <TableBody>
             {filteredUsers.length === 0 && (
               <TableRow>
-                <TableCell colSpan={5} className="text-center text-muted">
+                <TableCell
+                  colSpan={5}
+                  className="text-center text-slate-500 py-10"
+                >
                   No users found
                 </TableCell>
               </TableRow>
             )}
 
             {filteredUsers.map((user) => (
-              <TableRow key={user._id}>
-                <TableCell className="font-medium">
+              <TableRow key={user._id} className="hover:bg-slate-50 transition">
+                <TableCell className="font-medium text-slate-900">
                   {user.firstName} {user.lastName}
                 </TableCell>
 
                 <TableCell>
-                  <Badge variant="secondary">{user.role}</Badge>
+                  <Badge
+                    className={
+                      user.role === "admin"
+                        ? "bg-blue-100 text-blue-700"
+                        : user.role === "doctor"
+                          ? "bg-green-100 text-green-700"
+                          : "bg-slate-200 text-slate-700"
+                    }
+                  >
+                    {user.role}
+                  </Badge>
                 </TableCell>
 
-                <TableCell>{user.email}</TableCell>
-                <TableCell>{user.phone}</TableCell>
+                <TableCell className="text-slate-700">{user.email}</TableCell>
+
+                <TableCell className="text-slate-700">{user.phone}</TableCell>
 
                 <TableCell className="text-right space-x-2">
                   <Button
                     size="sm"
                     variant="outline"
+                    className="border-slate-300 text-slate-700"
                     onClick={() => setViewUser(user)}
                   >
                     View
                   </Button>
 
                   <Button
-                    className="bg-amber-100 text-amber-700 hover:bg-amber-200"
                     size="sm"
+                    className="bg-amber-100 text-amber-700 hover:bg-amber-200"
                     onClick={() => setEditUser(user)}
                   >
                     Edit
                   </Button>
 
                   <Button
-                    className="bg-red-600 hover:bg-red-700"
                     size="sm"
                     variant="destructive"
+                    className="bg-red-600 hover:bg-red-700"
                     onClick={() => setDeleteUser(user)}
                   >
                     Delete

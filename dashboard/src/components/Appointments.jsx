@@ -95,21 +95,24 @@ const Appointments = () => {
   };
 
   return (
-    <section className="space-y-6">
-      <h1 className="text-2xl font-bold text-slate-900">Appointments</h1>
+    <section className="space-y-6 bg-slate-50 p-6 rounded-xl">
+      {/* PAGE HEADER */}
+      <div className="flex items-center justify-between">
+        <h1 className="text-2xl font-bold text-slate-900">Appointments</h1>
+      </div>
 
       {/* 🔹 FILTER BAR */}
-      <div className="bg-white border shadow-sm rounded-2xl p-6 space-y-4">
+      <div className="bg-white border rounded-2xl p-5 shadow-sm space-y-4">
         <Input
           placeholder="Search patient, doctor, department..."
           value={search}
           onChange={(e) => setSearch(e.target.value)}
-          className="bg-white"
+          className="h-11 border-slate-300 focus:border-blue-600 focus:ring-1 focus:ring-blue-100"
         />
 
         <div className="flex flex-wrap gap-4">
           <select
-            className="input w-48"
+            className="h-11 w-48 rounded-lg border border-slate-300 px-3 text-sm text-slate-700 focus:border-blue-600 focus:outline-none"
             value={statusFilter}
             onChange={(e) => setStatusFilter(e.target.value)}
           >
@@ -121,7 +124,7 @@ const Appointments = () => {
           </select>
 
           <select
-            className="input w-48"
+            className="h-11 w-48 rounded-lg border border-slate-300 px-3 text-sm text-slate-700 focus:border-blue-600 focus:outline-none"
             value={sortOrder}
             onChange={(e) => setSortOrder(e.target.value)}
           >
@@ -132,48 +135,55 @@ const Appointments = () => {
       </div>
 
       {/* 🔹 TABLE */}
-      <div className="bg-white border shadow-sm rounded-2xl overflow-x-auto">
+      <div className="bg-white border rounded-2xl shadow-sm overflow-x-auto">
         <Table>
-          <TableHeader>
+          <TableHeader className="bg-slate-100">
             <TableRow>
-              <TableHead>Patient</TableHead>
-              <TableHead>Doctor</TableHead>
-              <TableHead>Department</TableHead>
-              <TableHead>Date</TableHead>
-              <TableHead>Status</TableHead>
-              <TableHead>Visited</TableHead>
-              <TableHead className="text-right">Action</TableHead>
+              <TableHead className="text-slate-700">Patient</TableHead>
+              <TableHead className="text-slate-700">Doctor</TableHead>
+              <TableHead className="text-slate-700">Department</TableHead>
+              <TableHead className="text-slate-700">Date</TableHead>
+              <TableHead className="text-slate-700">Status</TableHead>
+              <TableHead className="text-slate-700 text-center">
+                Visited
+              </TableHead>
+              <TableHead className="text-right text-slate-700">
+                Action
+              </TableHead>
             </TableRow>
           </TableHeader>
 
           <TableBody>
             {filteredAppointments.length === 0 && (
               <TableRow>
-                <TableCell colSpan={7} className="text-center text-slate-500">
+                <TableCell
+                  colSpan={7}
+                  className="text-center text-slate-500 py-10"
+                >
                   No appointments found
                 </TableCell>
               </TableRow>
             )}
 
             {filteredAppointments.map((a) => (
-              <TableRow key={a._id}>
-                <TableCell>
+              <TableRow key={a._id} className="hover:bg-slate-50 transition">
+                <TableCell className="font-medium text-slate-900">
                   {a.firstName} {a.lastName}
                 </TableCell>
 
-                <TableCell>
+                <TableCell className="text-slate-700">
                   Dr. {a.doctor.firstName} {a.doctor.lastName}
                 </TableCell>
 
-                <TableCell>{a.department}</TableCell>
+                <TableCell className="text-slate-700">{a.department}</TableCell>
 
-                <TableCell>
+                <TableCell className="text-slate-700">
                   {new Date(a.appointment_date).toLocaleDateString()}
                 </TableCell>
 
                 <TableCell>{statusBadge(a.status)}</TableCell>
 
-                <TableCell className="text-xl">
+                <TableCell className="text-center text-xl">
                   {a.hasVisited ? (
                     <GoCheckCircleFill className="text-green-600" />
                   ) : (
@@ -185,7 +195,7 @@ const Appointments = () => {
                   <select
                     value={a.status}
                     onChange={(e) => handleUpdateStatus(a._id, e.target.value)}
-                    className="input w-36"
+                    className="h-9 w-36 rounded-lg border border-slate-300 px-2 text-sm focus:border-blue-600 focus:outline-none"
                   >
                     <option value="Pending">Pending</option>
                     <option value="Confirmed">Confirmed</option>

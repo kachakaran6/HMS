@@ -164,121 +164,169 @@ const AddNewDoctor = () => {
   }
 
   return (
-    <section className="space-y-6">
-      <div className="max-w-3xl bg-white rounded-2xl shadow p-8">
-        <h2 className="text-2xl font-bold text-slate-900">Add Doctor</h2>
+    <section className="bg-slate-50 p-6 rounded-xl">
+      <div className="max-w-3xl bg-white rounded-2xl border shadow-sm p-8">
+        {/* HEADER */}
+        <div className="mb-6">
+          <h2 className="text-2xl font-bold text-slate-900">Add Doctor</h2>
+          <p className="mt-1 text-sm text-slate-600">
+            Enter professional and personal details to register a doctor
+          </p>
+        </div>
 
-        <p className="mt-1 text-slate-600">
-          Please enter details of the doctor
-        </p>
+        <form onSubmit={handleAddNewDoc} className="space-y-8">
+          {/* ================= AVATAR ================= */}
+          <section className="space-y-4">
+            <h3 className="text-sm font-semibold text-blue-600 uppercase tracking-wide">
+              Profile Photo
+            </h3>
 
-        <form onSubmit={handleAddNewDoc} className="mt-6 space-y-6">
-          {/* Avatar + Upload */}
-          <div className="flex flex-col md:flex-row gap-6 items-center">
-            <img
-              src={docAvatarPreview ? docAvatarPreview : "/docHolder.jpg"}
-              alt="Doctor Avatar"
-              className="w-32 h-32 rounded-full object-cover border"
-            />
+            <div className="flex items-center gap-6">
+              <img
+                src={docAvatarPreview || "/docHolder.jpg"}
+                alt="Doctor Avatar"
+                className="w-28 h-28 rounded-full object-cover border"
+              />
 
-            <label className="cursor-pointer">
-              <span className="inline-block px-4 py-2 rounded-lg bg-slate-100 text-slate-700 hover:bg-slate-200 transition">
-                Upload Avatar
-              </span>
-              <input type="file" onChange={handleAvatar} className="hidden" />
-            </label>
-          </div>
+              <label className="cursor-pointer">
+                <span className="inline-block px-5 py-2.5 rounded-lg bg-blue-50 text-blue-700 font-medium hover:bg-blue-100 transition">
+                  Upload Avatar
+                </span>
+                <input type="file" onChange={handleAvatar} className="hidden" />
+              </label>
+            </div>
+          </section>
 
-          {/* Name */}
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-            <input
-              type="text"
-              placeholder="First Name"
-              className="input"
-              value={firstName}
-              onChange={(e) => setFirstName(e.target.value)}
-            />
-            <input
-              type="text"
-              placeholder="Last Name"
-              className="input"
-              value={lastName}
-              onChange={(e) => setLastName(e.target.value)}
-            />
-          </div>
+          {/* ================= BASIC INFO ================= */}
+          <section className="space-y-4">
+            <h3 className="text-sm font-semibold text-blue-600 uppercase tracking-wide">
+              Basic Information
+            </h3>
 
-          {/* Email & Phone */}
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-            <input
-              type="email"
-              placeholder="Email"
-              className="input"
-              value={email}
-              onChange={(e) => setEmail(e.target.value)}
-            />
-            <input
-              type="tel"
-              placeholder="Phone Number"
-              className="input"
-              value={phone}
-              onChange={(e) => setPhone(e.target.value)}
-            />
-          </div>
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+              <div>
+                <label className="text-sm text-slate-700">First Name</label>
+                <input
+                  type="text"
+                  className="mt-1 w-full h-11 rounded-lg border border-slate-300 px-3 focus:border-blue-600 focus:outline-none"
+                  value={firstName}
+                  onChange={(e) => setFirstName(e.target.value)}
+                />
+              </div>
 
-          {/* Patient ID & DOB */}
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-            <input
-              type="text"
-              placeholder="Patient ID"
-              className="input"
-              value={patientId}
-              onChange={(e) => setPatientId(e.target.value)}
-            />
-            <input
-              type="date"
-              className="input"
-              value={dob}
-              onChange={(e) => setDob(e.target.value)}
-            />
-          </div>
+              <div>
+                <label className="text-sm text-slate-700">Last Name</label>
+                <input
+                  type="text"
+                  className="mt-1 w-full h-11 rounded-lg border border-slate-300 px-3 focus:border-blue-600 focus:outline-none"
+                  value={lastName}
+                  onChange={(e) => setLastName(e.target.value)}
+                />
+              </div>
+            </div>
+          </section>
 
-          {/* Gender & Password */}
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-            <select
-              className="input"
-              value={gender}
-              onChange={(e) => setGender(e.target.value)}
-            >
-              <option value="">Select Gender</option>
-              <option value="Male">Male</option>
-              <option value="Female">Female</option>
-            </select>
+          {/* ================= CONTACT ================= */}
+          <section className="space-y-4">
+            <h3 className="text-sm font-semibold text-blue-600 uppercase tracking-wide">
+              Contact Details
+            </h3>
 
-            <input
-              type="password"
-              placeholder="Password"
-              className="input"
-              value={password}
-              onChange={(e) => setPassword(e.target.value)}
-            />
-          </div>
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+              <div>
+                <label className="text-sm text-slate-700">Email</label>
+                <input
+                  type="email"
+                  className="mt-1 w-full h-11 rounded-lg border border-slate-300 px-3 focus:border-blue-600 focus:outline-none"
+                  value={email}
+                  onChange={(e) => setEmail(e.target.value)}
+                />
+              </div>
 
-          {/* Department */}
-          <select
-            className="input"
-            value={docDepartment}
-            onChange={(e) => setDocDepartment(e.target.value)}
-          >
-            <option value="">Select Department</option>
-            {departmentsArray.map((depart) => (
-              <option value={depart} key={depart}>
-                {depart}
-              </option>
-            ))}
-          </select>
+              <div>
+                <label className="text-sm text-slate-700">Phone</label>
+                <input
+                  type="tel"
+                  className="mt-1 w-full h-11 rounded-lg border border-slate-300 px-3 focus:border-blue-600 focus:outline-none"
+                  value={phone}
+                  onChange={(e) => setPhone(e.target.value)}
+                />
+              </div>
+            </div>
+          </section>
+
+          {/* ================= PERSONAL ================= */}
+          <section className="space-y-4">
+            <h3 className="text-sm font-semibold text-blue-600 uppercase tracking-wide">
+              Personal & Role
+            </h3>
+
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+              <div>
+                <label className="text-sm text-slate-700">Patient ID</label>
+                <input
+                  type="text"
+                  className="mt-1 w-full h-11 rounded-lg border border-slate-300 px-3 focus:border-blue-600 focus:outline-none"
+                  value={patientId}
+                  onChange={(e) => setPatientId(e.target.value)}
+                />
+              </div>
+
+              <div>
+                <label className="text-sm text-slate-700">Date of Birth</label>
+                <input
+                  type="date"
+                  className="mt-1 w-full h-11 rounded-lg border border-slate-300 px-3 focus:border-blue-600 focus:outline-none"
+                  value={dob}
+                  onChange={(e) => setDob(e.target.value)}
+                />
+              </div>
+
+              <div>
+                <label className="text-sm text-slate-700">Gender</label>
+                <select
+                  className="mt-1 w-full h-11 rounded-lg border border-slate-300 px-3 focus:border-blue-600 focus:outline-none"
+                  value={gender}
+                  onChange={(e) => setGender(e.target.value)}
+                >
+                  <option value="">Select Gender</option>
+                  <option value="Male">Male</option>
+                  <option value="Female">Female</option>
+                </select>
+              </div>
+
+              <div>
+                <label className="text-sm text-slate-700">Password</label>
+                <input
+                  type="password"
+                  className="mt-1 w-full h-11 rounded-lg border border-slate-300 px-3 focus:border-blue-600 focus:outline-none"
+                  value={password}
+                  onChange={(e) => setPassword(e.target.value)}
+                />
+              </div>
+            </div>
+
+            <div>
+              <label className="text-sm text-slate-700">Department</label>
+              <select
+                className="mt-1 w-full h-11 rounded-lg border border-slate-300 px-3 focus:border-blue-600 focus:outline-none"
+                value={docDepartment}
+                onChange={(e) => setDocDepartment(e.target.value)}
+              >
+                <option value="">Select Department</option>
+                {departmentsArray.map((depart) => (
+                  <option key={depart} value={depart}>
+                    {depart}
+                  </option>
+                ))}
+              </select>
+            </div>
+          </section>
+
+          {/* ================= EMAIL OTP ================= */}
           {showOtpBox && !otpVerified && (
-            <div className="space-y-4 border-t pt-6">
-              <h3 className="text-lg font-semibold text-slate-900">
+            <section className="space-y-4 border-t pt-6">
+              <h3 className="text-sm font-semibold text-blue-600 uppercase tracking-wide">
                 Email Verification
               </h3>
 
@@ -288,15 +336,13 @@ const AddNewDoctor = () => {
 
               <input
                 type="text"
-                placeholder="Enter 6-digit OTP"
-                className="input text-center tracking-widest"
-                value={otp}
-                onChange={(e) => setOtp(e.target.value)}
                 maxLength={6}
                 disabled={verifyingOtp}
+                className="w-full md:w-64 h-11 rounded-lg border border-slate-300 text-center tracking-widest focus:border-blue-600 focus:outline-none"
+                value={otp}
+                onChange={(e) => setOtp(e.target.value)}
               />
 
-              {/* Timer */}
               <p className="text-sm text-slate-500">
                 OTP expires in{" "}
                 <span className="font-semibold text-slate-700">
@@ -305,14 +351,14 @@ const AddNewDoctor = () => {
                 </span>
               </p>
 
-              <div className="flex flex-col md:flex-row gap-3">
+              <div className="flex flex-wrap gap-3">
                 <button
                   type="button"
                   onClick={handleVerifyOtp}
                   disabled={verifyingOtp}
-                  className="px-8 py-3 rounded-xl bg-green-600 text-white font-medium hover:opacity-90 transition disabled:opacity-60"
+                  className="px-8 py-3 rounded-xl bg-green-600 text-white font-medium hover:bg-green-700 transition disabled:opacity-60"
                 >
-                  {verifyingOtp ? "Verifying OTP..." : "Verify OTP"}
+                  {verifyingOtp ? "Verifying..." : "Verify OTP"}
                 </button>
 
                 <button
@@ -324,15 +370,15 @@ const AddNewDoctor = () => {
                   {sendingOtp ? "Resending..." : "Resend OTP"}
                 </button>
               </div>
-            </div>
+            </section>
           )}
 
-          {/* Submit */}
-          <div className="pt-4">
+          {/* ================= SUBMIT ================= */}
+          <div className="pt-6 border-t flex justify-end">
             <button
               type="submit"
               disabled={sendingOtp}
-              className="w-full md:w-auto px-8 py-3 rounded-xl bg-gradient-to-r from-blue-600 to-teal-500 text-white font-medium hover:opacity-90 transition disabled:opacity-60"
+              className="px-10 py-3 rounded-xl bg-blue-600 text-white font-medium hover:bg-blue-700 transition disabled:opacity-60"
             >
               {sendingOtp ? "Sending OTP..." : "Add Doctor"}
             </button>

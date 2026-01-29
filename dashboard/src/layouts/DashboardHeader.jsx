@@ -1,16 +1,14 @@
-import { GiHamburgerMenu } from "react-icons/gi";
+// import { GiHamburgerMenu } from "react-icons/gi";
+import ProfileMenu from "../components/ProfileMenu";
 
-const DashboardHeader = ({ onMenuClick }) => {
+const DashboardHeader = () => {
   return (
-    <header className="lg:hidden sticky top-0 z-40 bg-white border-b px-4 py-3 flex items-center">
-      <button
-        onClick={onMenuClick}
-        className="p-2 rounded-lg hover:bg-slate-100"
-      >
-        <GiHamburgerMenu className="text-2xl" />
-      </button>
+    <header className="h-16 sticky top-0 z-40 bg-white border-b px-6 flex items-center justify-between">
+      <h2 className="text-l font-bold text-blue-600 leading-tight">
+        Hospital Management System
+      </h2>
 
-      <h1 className="ml-3 font-semibold text-slate-900">HMS Admin</h1>
+      <ProfileMenu />
     </header>
   );
 };

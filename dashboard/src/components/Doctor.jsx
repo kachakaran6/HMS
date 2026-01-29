@@ -2,6 +2,12 @@ import axios from "axios";
 import React, { useContext, useEffect, useState } from "react";
 import { Context } from "../main";
 import { toast } from "react-toastify";
+import {
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+} from "@/components/ui/dialog";
 
 const Doctor = () => {
   const [doctors, setDoctors] = useState([]);
@@ -67,52 +73,44 @@ const Doctor = () => {
   };
 
   return (
-    <section className="space-y-6">
+    <section className="space-y-6 bg-slate-50 p-6 rounded-xl">
       <h1 className="text-2xl font-bold text-slate-900">Doctors</h1>
 
       {doctors.length > 0 ? (
-        <div
-          className="
-        grid grid-cols-1
-        sm:grid-cols-2
-        lg:grid-cols-3
-        xl:grid-cols-4
-        gap-6
-      "
-        >
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
           {doctors.map((doctor) => (
             <div
               key={doctor._id}
-              className="bg-white rounded-2xl shadow p-6 flex flex-col items-center text-center"
+              className="bg-white rounded-2xl border shadow-sm hover:shadow-md transition p-5 flex flex-col items-center text-center"
             >
+              {/* AVATAR */}
               <img
                 src={doctor.docAvatar?.url || "/doctor-placeholder.png"}
                 alt="doctor"
-                className="w-24 h-24 rounded-full object-cover mb-4 border"
+                className="w-24 h-24 rounded-full object-cover border mb-4"
               />
 
+              {/* NAME */}
               <h4 className="text-lg font-semibold text-slate-900">
-                {doctor.firstName} {doctor.lastName}
+                Dr. {doctor.firstName} {doctor.lastName}
               </h4>
 
+              {/* DEPARTMENT BADGE */}
+              <span className="mt-1 inline-block rounded-full bg-blue-100 text-blue-700 px-3 py-0.5 text-xs font-medium">
+                {doctor.doctorDepartment}
+              </span>
+
+              {/* DETAILS */}
               <div className="mt-3 space-y-1 text-sm text-slate-600">
-                <p>
-                  Department:{" "}
-                  <span className="font-medium text-slate-800">
-                    {doctor.doctorDepartment}
-                  </span>
-                </p>
-                <p>Email: {doctor.email}</p>
-                <p>Phone: {doctor.phone}</p>
-                {/* <p>Id: {doctor._id}</p>
-                <p>Patient Id: {doctor.patientId}</p> */}
+                <p>{doctor.email}</p>
+                <p>{doctor.phone}</p>
               </div>
 
               {/* ACTIONS */}
-              <div className="mt-4 flex gap-3">
+              <div className="mt-5 flex gap-3">
                 <button
                   onClick={() => setSelectedDoctor(doctor)}
-                  className="px-4 py-1.5 rounded-lg bg-blue-100 text-blue-700 hover:bg-blue-200 text-sm"
+                  className="px-4 py-1.5 rounded-lg bg-blue-600 text-white hover:bg-blue-700 text-sm"
                 >
                   Edit
                 </button>
@@ -132,74 +130,52 @@ const Doctor = () => {
       )}
 
       {selectedDoctor && (
-        <div className="fixed inset-0 bg-black/40 flex items-center justify-center z-50">
-          <div className="bg-white rounded-2xl p-6 w-full max-w-md">
-            <h3 className="text-xl font-semibold mb-4">Update Doctor</h3>
+        <Dialog open onOpenChange={() => setSelectedDoctor(null)}>
+          <DialogContent className="max-w-md bg-white rounded-2xl">
+            <DialogHeader>
+              <DialogTitle className="text-lg font-semibold text-slate-900">
+                Update Doctor
+              </DialogTitle>
+            </DialogHeader>
 
             <form onSubmit={handleUpdateDoctor} className="space-y-4">
-              <input
-                className="input"
-                value={selectedDoctor.firstName}
-                onChange={(e) =>
-                  setSelectedDoctor({
-                    ...selectedDoctor,
-                    firstName: e.target.value,
-                  })
-                }
-              />
-
-              <input
-                className="input"
-                value={selectedDoctor.lastName}
-                onChange={(e) =>
-                  setSelectedDoctor({
-                    ...selectedDoctor,
-                    lastName: e.target.value,
-                  })
-                }
-              />
-
-              <input
-                className="input"
-                value={selectedDoctor.email}
-                onChange={(e) =>
-                  setSelectedDoctor({
-                    ...selectedDoctor,
-                    email: e.target.value,
-                  })
-                }
-              />
-
-              <input
-                className="input"
-                value={selectedDoctor.phone}
-                onChange={(e) =>
-                  setSelectedDoctor({
-                    ...selectedDoctor,
-                    phone: e.target.value,
-                  })
-                }
-              />
+              {["firstName", "lastName", "email", "phone"].map((field) => (
+                <div key={field}>
+                  <label className="text-sm text-slate-700 capitalize">
+                    {field.replace(/([A-Z])/g, " $1")}
+                  </label>
+                  <input
+                    className="w-full h-11 rounded-lg border border-slate-300 px-3 focus:border-blue-600 focus:outline-none"
+                    value={selectedDoctor[field]}
+                    onChange={(e) =>
+                      setSelectedDoctor({
+                        ...selectedDoctor,
+                        [field]: e.target.value,
+                      })
+                    }
+                  />
+                </div>
+              ))}
 
               <div className="flex justify-end gap-3 pt-4">
                 <button
                   type="button"
                   onClick={() => setSelectedDoctor(null)}
-                  className="px-4 py-2 rounded-lg border"
+                  className="px-4 py-2 rounded-lg border border-slate-300 text-slate-700"
                 >
                   Cancel
                 </button>
 
                 <button
                   type="submit"
-                  className="px-4 py-2 rounded-lg bg-blue-600 text-white"
+                  className="px-4 py-2 rounded-lg bg-blue-600 text-white hover:bg-blue-700"
                 >
                   Update
                 </button>
               </div>
             </form>
-          </div>
-        </div>
+          </DialogContent>
+        </Dialog>
       )}
 
       {doctorToDelete && (

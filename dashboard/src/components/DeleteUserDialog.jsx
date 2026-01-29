@@ -18,7 +18,7 @@ const DeleteUserDialog = ({ user, onClose, onDeleted }) => {
 
   const handleDelete = async () => {
     try {
-      await axios.delete(`${baseurl}/api/v1/user/doctor/delete/${user._id}`, {
+      await axios.delete(`${baseurl}/api/v1/user/user/delete/${user._id}`, {
         withCredentials: true,
       });
 

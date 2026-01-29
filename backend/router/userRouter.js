@@ -11,6 +11,8 @@ import {
   getUserDetails,
   updateDoctor,
   deleteDoctor,
+  updateUser,
+  deleteUser,
 } from "../controller/userController.js";
 import {
   isAdminAuthenticated,
@@ -215,6 +217,9 @@ router.post("/doctor/addnew", isAdminAuthenticated, addNewDoctor);
 
 router.put("/doctor/update/:id", isAdminAuthenticated, updateDoctor);
 router.delete("/doctor/delete/:id", isAdminAuthenticated, deleteDoctor);
+
+router.put("/user/update/:id", isAdminAuthenticated, updateUser);
+router.delete("/user/delete/:id", isAdminAuthenticated, deleteUser);
 
 /**
  * @swagger
