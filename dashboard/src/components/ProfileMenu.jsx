@@ -48,7 +48,10 @@ const ProfileMenu = () => {
   return (
     <div className="relative">
       {/* AVATAR BUTTON */}
-      <button className="w-9 h-9 rounded-full overflow-hidden border">
+      <button
+        className="w-9 h-9 rounded-full overflow-hidden border"
+        onClick={() => setOpen((prev) => !prev)}
+      >
         <img
           src={avatarUrl}
           alt="Profile"
