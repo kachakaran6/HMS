@@ -1,7 +1,7 @@
 import axios from "axios";
 import React, { useContext, useEffect, useState } from "react";
 import { Context } from "../main";
-import { toast } from "react-toastify";
+import { toast } from "sonner";
 import {
   Dialog,
   DialogContent,
@@ -14,6 +14,7 @@ const Doctor = () => {
   const { isAuthenticated } = useContext(Context);
   const [selectedDoctor, setSelectedDoctor] = useState(null);
   const [doctorToDelete, setDoctorToDelete] = useState(null);
+  const [loading, setLoading] = useState(true);
 
   const baseurl = import.meta.env.VITE_API_BASE_URL;
 
@@ -22,13 +23,26 @@ const Doctor = () => {
     // http://localhost:3000/api/v1/doctor/update/:id"
     // http://localhost:3000/api/v1/doctor/delete/:id"
     const fetchDoctors = async () => {
-      const { data } = await axios.get(`${baseurl}/api/v1/user/allDoc`, {
-        withCredentials: true,
-      });
-      setDoctors(data.users || []);
-      console.log(data.users);
+      try {
+        setLoading(true);
+
+        const { data } = await axios.get(`${baseurl}/api/v1/user/allDoc`, {
+          withCredentials: true,
+        });
+
+        setDoctors(data.users || []);
+      } catch (error) {
+        toast.error(
+          "Failed to fetch doctors",
+          { position: "top-right" },
+          error.message,
+        );
+      } finally {
+        setLoading(false);
+      }
     };
-    fetchDoctors();
+
+    if (isAuthenticated) fetchDoctors();
   }, [isAuthenticated]);
 
   const confirmDeleteDoctor = async () => {
@@ -42,10 +56,14 @@ const Doctor = () => {
         prev.filter((doc) => doc._id !== doctorToDelete._id),
       );
 
-      toast.success("Doctor deleted successfully");
+      toast.success("Doctor deleted successfully", { position: "top-right" });
       setDoctorToDelete(null);
     } catch (error) {
-      toast.error("Failed to delete doctor", error.message);
+      toast.error(
+        "Failed to delete doctor",
+        { position: "top-right" },
+        error.message,
+      );
     }
   };
 
@@ -65,18 +83,29 @@ const Doctor = () => {
         ),
       );
 
-      toast.success("Doctor updated successfully");
+      toast.success("Doctor updated successfully", { position: "top-right" });
       setSelectedDoctor(null);
     } catch (error) {
-      toast.error("Failed to update doctor", error.message);
+      toast.error(
+        "Failed to update doctor",
+        { position: "top-right" },
+        error.message,
+      );
     }
   };
+
+  const Loader = () => (
+    <div className="flex items-center justify-center py-20">
+      <div className="h-10 w-10 animate-spin rounded-full border-4 border-slate-300 border-t-blue-600" />
+    </div>
+  );
 
   return (
     <section className="space-y-6 bg-slate-50 p-6 rounded-xl">
       <h1 className="text-2xl font-bold text-slate-900">Doctors</h1>
-
-      {doctors.length > 0 ? (
+      {loading ? (
+        <Loader />
+      ) : doctors.length > 0 ? (
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
           {doctors.map((doctor) => (
             <div

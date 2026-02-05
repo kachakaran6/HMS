@@ -13,8 +13,13 @@ const ProfileMenu = () => {
 
   const baseURL = import.meta.env.VITE_API_BASE_URL;
 
-  const avatarUrl =
-    user?.docAvatar?.url || user?.avatar?.url || "/default-avatar.png";
+  // const avatarUrl =
+  //   user?.docAvatar?.url || user?.avatar?.url || "/default-avatar.png";
+
+  const userInitial =
+    user?.firstName?.charAt(0)?.toUpperCase() ||
+    user?.lastName?.charAt(0)?.toUpperCase() ||
+    "?";
 
   useEffect(() => {
     // http://localhost:3000/api/v1/user/allDoc
@@ -52,11 +57,15 @@ const ProfileMenu = () => {
         className="w-9 h-9 rounded-full overflow-hidden border"
         onClick={() => setOpen((prev) => !prev)}
       >
-        <img
-          src={avatarUrl}
-          alt="Profile"
-          className="w-full h-full object-cover"
-        />
+        {user?.docAvatar?.url || user?.avatar?.url ? (
+          <img
+            src={user?.docAvatar?.url || user?.avatar?.url}
+            alt="Profile"
+            className="w-full h-full object-cover"
+          />
+        ) : (
+          <span>{userInitial}</span>
+        )}
       </button>
 
       {/* DROPDOWN */}

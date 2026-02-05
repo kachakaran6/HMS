@@ -3,6 +3,13 @@ import axios from "axios";
 import { toast } from "sonner";
 import { GoCheckCircleFill } from "react-icons/go";
 import { AiFillCloseCircle } from "react-icons/ai";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
 
 import { Input } from "@/components/ui/input";
 import { Badge } from "@/components/ui/badge";
@@ -27,6 +34,7 @@ const Appointments = () => {
   const [search, setSearch] = useState("");
   const [statusFilter, setStatusFilter] = useState("all");
   const [sortOrder, setSortOrder] = useState("latest");
+  const [loading, setLoading] = useState(true);
 
   /* ================= FETCH ================= */
   useEffect(() => {
@@ -36,9 +44,11 @@ const Appointments = () => {
           withCredentials: true,
         });
 
-        setAppointments(data.appointements || []);
+        setAppointments(data.appointments || data.appointements || []);
       } catch {
-        toast.error("Failed to fetch appointments");
+        toast.error("Failed to fetch appointments", { position: "top-right" });
+      } finally {
+        setLoading(false);
       }
     };
 
@@ -98,9 +108,9 @@ const Appointments = () => {
         prev.map((a) => (a._id === id ? { ...a, status } : a)),
       );
 
-      toast.success("Appointment updated");
+      toast.success("Appointment updated", { position: "top-right" });
     } catch {
-      toast.error("Failed to update appointment");
+      toast.error("Failed to update appointment", { position: "top-right" });
     }
   };
 
@@ -117,6 +127,12 @@ const Appointments = () => {
         return <Badge className="bg-green-100 text-green-700">Confirmed</Badge>;
     }
   };
+
+  const Loader = () => (
+    <div className="flex items-center justify-center py-20">
+      <div className="h-10 w-10 animate-spin rounded-full border-4 border-slate-300 border-t-blue-600" />
+    </div>
+  );
 
   return (
     <section className="space-y-6 bg-slate-50 p-6 rounded-xl">
@@ -135,26 +151,30 @@ const Appointments = () => {
         />
 
         <div className="flex flex-wrap gap-4">
-          <select
-            className="h-11 w-48 rounded-lg border px-3 text-sm"
-            value={statusFilter}
-            onChange={(e) => setStatusFilter(e.target.value)}
-          >
-            <option value="all">All Status</option>
-            <option value="Pending">Pending</option>
-            <option value="Confirmed">Confirmed</option>
-            <option value="Cancelled">Cancelled</option>
-            <option value="Completed">Completed</option>
-          </select>
+          <Select value={statusFilter} onValueChange={setStatusFilter}>
+            <SelectTrigger className="h-11 w-48">
+              <SelectValue placeholder="All Status" />
+            </SelectTrigger>
 
-          <select
-            className="h-11 w-48 rounded-lg border px-3 text-sm"
-            value={sortOrder}
-            onChange={(e) => setSortOrder(e.target.value)}
-          >
-            <option value="latest">Latest First</option>
-            <option value="oldest">Oldest First</option>
-          </select>
+            <SelectContent>
+              <SelectItem value="all">All Status</SelectItem>
+              <SelectItem value="Pending">Pending</SelectItem>
+              <SelectItem value="Confirmed">Confirmed</SelectItem>
+              <SelectItem value="Cancelled">Cancelled</SelectItem>
+              <SelectItem value="Completed">Completed</SelectItem>
+            </SelectContent>
+          </Select>
+
+          <Select value={sortOrder} onValueChange={setSortOrder}>
+            <SelectTrigger className="h-11 w-48">
+              <SelectValue placeholder="Sort Order" />
+            </SelectTrigger>
+
+            <SelectContent>
+              <SelectItem value="latest">Latest First</SelectItem>
+              <SelectItem value="oldest">Oldest First</SelectItem>
+            </SelectContent>
+          </Select>
         </div>
       </div>
 
@@ -176,7 +196,17 @@ const Appointments = () => {
           </TableHeader>
 
           <TableBody>
-            {filteredAppointments.length === 0 && (
+            {loading ? (
+              /* 🔄 LOADER STATE */
+              <TableRow>
+                <TableCell colSpan={role === "admin" ? 7 : 6} className="py-20">
+                  <div className="flex items-center justify-center">
+                    <div className="h-10 w-10 animate-spin rounded-full border-4 border-slate-300 border-t-blue-600" />
+                  </div>
+                </TableCell>
+              </TableRow>
+            ) : filteredAppointments.length === 0 ? (
+              /* ❌ EMPTY STATE */
               <TableRow>
                 <TableCell
                   colSpan={role === "admin" ? 7 : 6}
@@ -185,54 +215,60 @@ const Appointments = () => {
                   No appointments found
                 </TableCell>
               </TableRow>
-            )}
-
-            {filteredAppointments.map((a) => (
-              <TableRow key={a._id}>
-                <TableCell className="font-medium">
-                  {a.firstName} {a.lastName}
-                </TableCell>
-
-                {role === "admin" && (
-                  <TableCell>
-                    Dr. {a.doctor.firstName} {a.doctor.lastName}
+            ) : (
+              /* ✅ DATA STATE */
+              filteredAppointments.map((a) => (
+                <TableRow key={a._id}>
+                  <TableCell className="font-medium">
+                    {a.firstName} {a.lastName}
                   </TableCell>
-                )}
 
-                <TableCell>{a.department}</TableCell>
-
-                <TableCell>
-                  {new Date(a.appointment_date).toLocaleDateString()}
-                </TableCell>
-
-                <TableCell>{statusBadge(a.status)}</TableCell>
-
-                <TableCell className="text-center text-xl">
-                  {a.hasVisited ? (
-                    <GoCheckCircleFill className="text-green-600" />
-                  ) : (
-                    <AiFillCloseCircle className="text-red-500" />
+                  {role === "admin" && (
+                    <TableCell>
+                      Dr. {a.doctor.firstName} {a.doctor.lastName}
+                    </TableCell>
                   )}
-                </TableCell>
 
-                {role === "admin" && (
-                  <TableCell className="text-right">
-                    <select
-                      value={a.status}
-                      onChange={(e) =>
-                        handleUpdateStatus(a._id, e.target.value)
-                      }
-                      className="h-9 w-36 rounded-lg border px-2 text-sm"
-                    >
-                      <option value="Pending">Pending</option>
-                      <option value="Confirmed">Confirmed</option>
-                      <option value="Cancelled">Cancelled</option>
-                      <option value="Completed">Completed</option>
-                    </select>
+                  <TableCell>{a.department}</TableCell>
+
+                  <TableCell>
+                    {new Date(a.appointment_date).toLocaleDateString()}
                   </TableCell>
-                )}
-              </TableRow>
-            ))}
+
+                  <TableCell>{statusBadge(a.status)}</TableCell>
+
+                  <TableCell className="text-center text-xl">
+                    {a.hasVisited ? (
+                      <GoCheckCircleFill className="text-green-600" />
+                    ) : (
+                      <AiFillCloseCircle className="text-red-500" />
+                    )}
+                  </TableCell>
+
+                  {role === "admin" && (
+                    <TableCell className="text-right">
+                      <Select
+                        value={a.status}
+                        onValueChange={(value) =>
+                          handleUpdateStatus(a._id, value)
+                        }
+                      >
+                        <SelectTrigger className="h-9 w-36 text-sm">
+                          <SelectValue />
+                        </SelectTrigger>
+
+                        <SelectContent>
+                          <SelectItem value="Pending">Pending</SelectItem>
+                          <SelectItem value="Confirmed">Confirmed</SelectItem>
+                          <SelectItem value="Cancelled">Cancelled</SelectItem>
+                          <SelectItem value="Completed">Completed</SelectItem>
+                        </SelectContent>
+                      </Select>
+                    </TableCell>
+                  )}
+                </TableRow>
+              ))
+            )}
           </TableBody>
         </Table>
       </div>

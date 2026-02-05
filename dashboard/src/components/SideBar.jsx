@@ -2,7 +2,7 @@ import { useContext } from "react";
 import { NavLink, useNavigate } from "react-router-dom";
 import { Context } from "../main";
 import axios from "axios";
-import { toast } from "react-toastify";
+import { toast } from "sonner";
 
 import { AiFillMessage } from "react-icons/ai";
 import { RiLogoutBoxFill } from "react-icons/ri";
@@ -26,11 +26,11 @@ const SideBar = ({ onLinkClick }) => {
         {},
         { withCredentials: true },
       );
-      toast.success(data.message);
+      toast.success(data.message, { position: "top-right" });
       setIsAuthenticated(false);
       navigate("/login");
     } catch {
-      toast.error("Logout failed");
+      toast.error("Logout failed", { position: "top-right" });
     }
   };
 

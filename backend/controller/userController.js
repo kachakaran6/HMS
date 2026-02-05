@@ -60,15 +60,16 @@ export const registerUser = catchAsyncErros(async (req, res, next) => {
 });
 
 export const login = catchAsyncErros(async (req, res, next) => {
-  const { email, password, confirmPassword, role } = req.body;
-  if (!email || !password || !confirmPassword || !role) {
+  const { email, password, role } = req.body;
+  if (!email || !password || !role) {
     return next(new ErrorHandler("Please Fill Full Form!", 400));
   }
-  if (password !== confirmPassword) {
-    return next(
-      new ErrorHandler("Password & Confirm Password Do Not Match!", 400),
-    );
-  }
+  // if (password !== confirmPassword) {
+  //   return next(
+  //     new ErrorHandler("Password & Confirm Password Do Not Match!", 400),
+  //   );
+  // }
+
   const user = await User.findOne({ email }).select("+password");
   if (!user) {
     return next(new ErrorHandler("Invalid Email Or Password!", 400));

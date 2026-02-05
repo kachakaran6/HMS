@@ -1,7 +1,7 @@
 /* eslint-disable react-hooks/set-state-in-effect */
 import axios from "axios";
 import { useEffect, useState } from "react";
-import { toast } from "react-toastify";
+import { toast } from "sonner";
 
 import {
   Dialog,
@@ -54,11 +54,11 @@ const UserEditDialog = ({ user, onClose, onUpdated }) => {
         { withCredentials: true },
       );
 
-      toast.success("User updated successfully");
+      toast.success("User updated successfully", { position: "top-right" });
       onUpdated(data.user || form);
       onClose();
     } catch {
-      toast.error("Failed to update user");
+      toast.error("Failed to update user", { position: "top-right" });
     } finally {
       setLoading(false);
     }

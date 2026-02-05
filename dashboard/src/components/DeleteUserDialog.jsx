@@ -1,5 +1,5 @@
 import axios from "axios";
-import { toast } from "react-toastify";
+import { toast } from "sonner";
 
 import {
   AlertDialog,
@@ -22,11 +22,11 @@ const DeleteUserDialog = ({ user, onClose, onDeleted }) => {
         withCredentials: true,
       });
 
-      toast.success("User deleted");
+      toast.success("User deleted", { position: "top-right" });
       onDeleted(user._id);
       onClose();
     } catch {
-      toast.error("Failed to delete user");
+      toast.error("Failed to delete user", { position: "top-right" });
     }
   };
 

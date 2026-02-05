@@ -1,6 +1,6 @@
 import { useState } from "react";
 import axios from "axios";
-import { toast } from "react-toastify";
+import { toast } from "sonner";
 
 const ForgotPassword = () => {
   const baseURL = import.meta.env.VITE_API_BASE_URL;
@@ -16,10 +16,10 @@ const ForgotPassword = () => {
   const sendOtp = async () => {
     try {
       await axios.post(`${baseURL}/api/v1/auth/send-otp`, { email });
-      toast.success("OTP sent");
+      toast.success("OTP sent", { position: "top-right" });
       setOtpSent(true);
     } catch {
-      toast.error("Failed to send OTP");
+      toast.error("Failed to send OTP", { position: "top-right" });
     }
   };
 

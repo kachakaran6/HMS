@@ -2,8 +2,16 @@
 import axios from "axios";
 import React, { useContext, useState, useEffect } from "react";
 import { Navigate, useNavigate } from "react-router-dom";
-import { toast } from "react-toastify";
+import { toast } from "sonner";
 import { Context } from "../main";
+import { Eye, EyeOff, Loader2 } from "lucide-react";
+import {
+  Select,
+  SelectTrigger,
+  SelectValue,
+  SelectContent,
+  SelectItem,
+} from "@/components/ui/select";
 
 const AddNewDoctor = () => {
   const { isAuthenticated } = useContext(Context);
@@ -25,6 +33,7 @@ const AddNewDoctor = () => {
   const [sendingOtp, setSendingOtp] = useState(false);
   const [verifyingOtp, setVerifyingOtp] = useState(false);
   const OTP_DURATION = 300; // 5 minutes in seconds
+  const [showPassword, setShowPassword] = useState(false);
 
   const [timeLeft, setTimeLeft] = useState(OTP_DURATION);
   const [canResend, setCanResend] = useState(false);
@@ -99,10 +108,14 @@ const AddNewDoctor = () => {
         },
       );
 
-      toast.success("Doctor added. OTP sent to doctor email.");
+      toast.success("Doctor added. OTP sent to doctor email.", {
+        position: "top-right",
+      });
       setShowOtpBox(true);
     } catch (error) {
-      toast.error(error?.response?.data?.message || "Registration failed");
+      toast.error(error?.response?.data?.message || "Registration failed", {
+        position: "top-right",
+      });
     } finally {
       setSendingOtp(false);
     }
@@ -284,42 +297,58 @@ const AddNewDoctor = () => {
 
               <div>
                 <label className="text-sm text-slate-700">Gender</label>
-                <select
-                  className="mt-1 w-full h-11 rounded-lg border border-slate-300 px-3 focus:border-blue-600 focus:outline-none"
-                  value={gender}
-                  onChange={(e) => setGender(e.target.value)}
-                >
-                  <option value="">Select Gender</option>
-                  <option value="Male">Male</option>
-                  <option value="Female">Female</option>
-                </select>
+
+                <Select value={gender} onValueChange={setGender}>
+                  <SelectTrigger className="mt-1 w-full h-11 rounded-lg border border-slate-300 text-sm focus:border-blue-600">
+                    <SelectValue placeholder="Select Gender" />
+                  </SelectTrigger>
+
+                  <SelectContent className="bg-white border shadow-md rounded-lg">
+                    <SelectItem value="Male">Male</SelectItem>
+                    <SelectItem value="Female">Female</SelectItem>
+                  </SelectContent>
+                </Select>
               </div>
 
               <div>
                 <label className="text-sm text-slate-700">Password</label>
-                <input
-                  type="password"
-                  className="mt-1 w-full h-11 rounded-lg border border-slate-300 px-3 focus:border-blue-600 focus:outline-none"
-                  value={password}
-                  onChange={(e) => setPassword(e.target.value)}
-                />
+
+                <div className="relative mt-1">
+                  <input
+                    type={showPassword ? "text" : "password"}
+                    className="w-full h-11 rounded-lg border border-slate-300 px-3 pr-10
+                 focus:border-blue-600 focus:outline-none"
+                    value={password}
+                    onChange={(e) => setPassword(e.target.value)}
+                  />
+
+                  <button
+                    type="button"
+                    onClick={() => setShowPassword((prev) => !prev)}
+                    className="absolute right-3 top-1/2 -translate-y-1/2 text-slate-500 hover:text-slate-700"
+                  >
+                    {showPassword ? <EyeOff size={18} /> : <Eye size={18} />}
+                  </button>
+                </div>
               </div>
             </div>
 
             <div>
               <label className="text-sm text-slate-700">Department</label>
-              <select
-                className="mt-1 w-full h-11 rounded-lg border border-slate-300 px-3 focus:border-blue-600 focus:outline-none"
-                value={docDepartment}
-                onChange={(e) => setDocDepartment(e.target.value)}
-              >
-                <option value="">Select Department</option>
-                {departmentsArray.map((depart) => (
-                  <option key={depart} value={depart}>
-                    {depart}
-                  </option>
-                ))}
-              </select>
+
+              <Select value={docDepartment} onValueChange={setDocDepartment}>
+                <SelectTrigger className="mt-1 w-full h-11 rounded-lg border border-slate-300 text-sm focus:border-blue-600">
+                  <SelectValue placeholder="Select Department" />
+                </SelectTrigger>
+
+                <SelectContent className="bg-white border shadow-md rounded-lg">
+                  {departmentsArray.map((depart) => (
+                    <SelectItem key={depart} value={depart}>
+                      {depart}
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
             </div>
           </section>
 

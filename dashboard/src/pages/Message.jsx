@@ -7,11 +7,13 @@ const Message = () => {
   const [messages, setMessages] = useState([]);
   const { isAuthenticated } = useContext(Context);
   const baseURL = import.meta.env.VITE_API_BASE_URL;
+  const [loading, setLoading] = useState(true);
   // http://localhost:3000/api/v1/message/all
 
   useEffect(() => {
     const fetchMessage = async () => {
       try {
+        setLoading(true);
         const { data } = await axios.get(`${baseURL}/api/v1/message/all`, {
           withCredentials: true,
         });
@@ -19,6 +21,8 @@ const Message = () => {
         console.log(data.messages);
       } catch (error) {
         console.log(error);
+      } finally {
+        setLoading(false);
       }
     };
     fetchMessage();
@@ -27,14 +31,21 @@ const Message = () => {
   if (!isAuthenticated) {
     return <Navigate to="/login" />;
   }
+
+  const Loader = () => (
+    <div className="flex items-center justify-center py-20">
+      <div className="h-10 w-10 animate-spin rounded-full border-4 border-slate-300 border-t-blue-600" />
+    </div>
+  );
   return (
     <section className="space-y-6 bg-slate-50 p-6 rounded-xl">
       {/* PAGE HEADER */}
       <div className="flex items-center justify-between">
         <h1 className="text-2xl font-bold text-slate-900">Messages</h1>
       </div>
-
-      {messages && messages.length > 0 ? (
+      {loading ? (
+        <Loader />
+      ) : messages && messages.length > 0 ? (
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
           {messages.map((element) => (
             <div

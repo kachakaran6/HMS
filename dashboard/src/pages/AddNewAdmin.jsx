@@ -1,8 +1,16 @@
 import axios from "axios";
 import React, { useContext, useState } from "react";
 import { Navigate } from "react-router-dom";
-import { toast } from "react-toastify";
+import { toast } from "sonner";
 import { Context } from "../main";
+import { Eye, EyeOff, Loader2 } from "lucide-react";
+import {
+  Select,
+  SelectTrigger,
+  SelectValue,
+  SelectContent,
+  SelectItem,
+} from "@/components/ui/select";
 
 const AddNewAdmin = () => {
   const { isAuthenticated, setIsAuthenticated } = useContext(Context);
@@ -15,6 +23,8 @@ const AddNewAdmin = () => {
   const [dob, setDob] = useState("");
   const [gender, setGender] = useState("");
   const [password, setPassword] = useState("");
+  const [showPassword, setShowPassword] = useState(false);
+  const [isLoading, setIsLoading] = useState(false);
   const baseURL = import.meta.env.VITE_API_BASE_URL;
   //   const navigateTo = useNavigate();
 
@@ -22,6 +32,7 @@ const AddNewAdmin = () => {
     e.preventDefault();
 
     try {
+      setIsLoading(true);
       // http://localhost:3000/api/v1/user/admin/addnew
       const res = await axios.post(
         `${baseURL}/api/v1/user/admin/addnew`,
@@ -41,11 +52,26 @@ const AddNewAdmin = () => {
         },
       );
 
-      toast.success(res.data.message || "Registered successfully");
+      toast.success(res.data.message || "Registered successfully", {
+        position: "top-right",
+      });
       setIsAuthenticated(true);
     } catch (error) {
-      toast.error(error?.response?.data?.message || "Registration failed");
+      toast.error(error?.response?.data?.message || "Registration failed", {
+        position: "top-right",
+      });
+    } finally {
+      setIsLoading(false);
     }
+
+    setDob("");
+    setEmail("");
+    setFirstName("");
+    setGender("");
+    setLastName("");
+    setPassword("");
+    setPatientId("");
+    setPhone("");
   };
 
   if (!isAuthenticated) {
@@ -160,27 +186,45 @@ const AddNewAdmin = () => {
             </h3>
 
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-              <div>
-                <label className="text-sm text-slate-700">Gender</label>
-                <select
-                  className="mt-1 w-full h-11 rounded-lg border border-slate-300 px-3 focus:border-blue-600 focus:outline-none"
-                  value={gender}
-                  onChange={(e) => setGender(e.target.value)}
-                >
-                  <option value="">Select Gender</option>
-                  <option value="Male">Male</option>
-                  <option value="Female">Female</option>
-                </select>
+              {/* Gender */}
+              <div className="flex flex-col">
+                <label className="mb-1 text-sm text-slate-700">Gender</label>
+
+                <Select value={gender} onValueChange={setGender}>
+                  <SelectTrigger className=" w-full rounded-lg border border-slate-300 text-sm focus:border-blue-600">
+                    <SelectValue placeholder="Select Gender" />
+                  </SelectTrigger>
+
+                  <SelectContent className="bg-white border shadow-md rounded-lg">
+                    <SelectItem value="Male">Male</SelectItem>
+                    <SelectItem value="Female">Female</SelectItem>
+                  </SelectContent>
+                </Select>
               </div>
 
-              <div>
-                <label className="text-sm text-slate-700">Password</label>
-                <input
-                  type="password"
-                  className="mt-1 w-full h-11 rounded-lg border border-slate-300 px-3 focus:border-blue-600 focus:outline-none"
-                  value={password}
-                  onChange={(e) => setPassword(e.target.value)}
-                />
+              {/* Password */}
+              <div className="flex flex-col">
+                <label className="mb-1 text-sm text-slate-700">Password</label>
+
+                <div className="relative">
+                  <input
+                    type={showPassword ? "text" : "password"}
+                    placeholder="Enter password"
+                    className="h-11 w-full rounded-lg border border-slate-300 px-3 pr-10 text-sm
+                     focus:border-blue-600 focus:outline-none"
+                    value={password}
+                    onChange={(e) => setPassword(e.target.value)}
+                    required
+                  />
+
+                  <button
+                    type="button"
+                    onClick={() => setShowPassword(!showPassword)}
+                    className="absolute right-3 top-1/2 -translate-y-1/2 text-slate-500 hover:text-slate-700"
+                  >
+                    {showPassword ? <EyeOff size={16} /> : <Eye size={16} />}
+                  </button>
+                </div>
               </div>
             </div>
           </section>
@@ -189,9 +233,11 @@ const AddNewAdmin = () => {
           <div className="pt-6 border-t flex justify-end">
             <button
               type="submit"
+              disabled={isLoading}
               className="px-8 py-3 rounded-xl bg-blue-600 text-white font-medium hover:bg-blue-700 transition"
             >
-              Register Admin
+              {isLoading && <Loader2 className="h-4 w-4 animate-spin" />}
+              {isLoading ? "Registering..." : "Register Admin"}
             </button>
           </div>
         </form>

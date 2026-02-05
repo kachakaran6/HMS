@@ -10,15 +10,18 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import { Shield, Stethoscope } from "lucide-react";
+import { Shield, Stethoscope, Loader2, Eye, EyeOff } from "lucide-react";
 
 const Login = () => {
   const { isAuthenticated, setIsAuthenticated } = useContext(Context);
 
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
-  const [confirmPassword, setConfirmPassword] = useState("");
+  // const [confirmPassword, setConfirmPassword] = useState("");
   const [role, setRole] = useState("admin");
+  const [isLoading, setIsLoading] = useState(false);
+  const [showPassword, setShowPassword] = useState(false);
+  // const [showConfirmPassword, setShowConfirmPassword] = useState(false);
 
   const baseURL = import.meta.env.VITE_API_BASE_URL;
   const navigateTo = useNavigate();
@@ -26,29 +29,25 @@ const Login = () => {
   const handleLogin = async (e) => {
     e.preventDefault();
 
-    if (password !== confirmPassword) {
-      toast.error("Password and Confirm Password must match", {
-        position: "top-right",
-      });
-      return;
-    }
+    // if (password !== confirmPassword) {
+    //   toast.error("Password and Confirm Password must match");
+    //   return;
+    // }
 
     try {
+      setIsLoading(true);
+
       const { data } = await axios.post(
         `${baseURL}/api/v1/user/login`,
-        {
-          email,
-          password,
-          confirmPassword,
-          role, // ✅ admin OR doctor
-        },
+        { email, password, role },
+        // { email, password, confirmPassword, role },
         {
           withCredentials: true,
           headers: { "Content-Type": "application/json" },
         },
       );
 
-      toast.success(data.message);
+      toast.success(data.message, { position: "top-right" });
       localStorage.setItem("role", role);
       setIsAuthenticated(true);
       navigateTo("/");
@@ -56,6 +55,8 @@ const Login = () => {
       toast.error(error.response?.data?.message || "Login failed", {
         position: "top-right",
       });
+    } finally {
+      setIsLoading(false);
     }
   };
 
@@ -88,24 +89,43 @@ const Login = () => {
             required
           />
 
-          <input
-            type="password"
-            placeholder="Password"
-            className="w-full h-10 rounded-lg border border-slate-300 px-3 text-sm focus:border-blue-600 focus:outline-none"
-            value={password}
-            onChange={(e) => setPassword(e.target.value)}
-            required
-          />
+          <div className="relative">
+            <input
+              type={showPassword ? "text" : "password"}
+              placeholder="Password"
+              className="w-full h-10 rounded-lg border border-slate-300 px-3 pr-10 text-sm focus:border-blue-600 focus:outline-none"
+              value={password}
+              onChange={(e) => setPassword(e.target.value)}
+              required
+            />
 
-          {/* Backend requirement */}
-          <input
-            type="password"
-            placeholder="Confirm Password"
-            className="w-full h-10 rounded-lg border border-slate-300 px-3 text-sm focus:border-blue-600 focus:outline-none"
-            value={confirmPassword}
-            onChange={(e) => setConfirmPassword(e.target.value)}
-            required
-          />
+            <button
+              type="button"
+              onClick={() => setShowPassword(!showPassword)}
+              className="absolute right-3 top-1/2 -translate-y-1/2 text-slate-500"
+            >
+              {showPassword ? <EyeOff size={16} /> : <Eye size={16} />}
+            </button>
+          </div>
+
+          {/* <div className="relative">
+            <input
+              type={showConfirmPassword ? "text" : "password"}
+              placeholder="Confirm Password"
+              className="w-full h-10 rounded-lg border border-slate-300 px-3 pr-10 text-sm focus:border-blue-600 focus:outline-none"
+              value={confirmPassword}
+              onChange={(e) => setConfirmPassword(e.target.value)}
+              required
+            />
+
+            <button
+              type="button"
+              onClick={() => setShowConfirmPassword(!showConfirmPassword)}
+              className="absolute right-3 top-1/2 -translate-y-1/2 text-slate-500"
+            >
+              {showConfirmPassword ? <EyeOff size={16} /> : <Eye size={16} />}
+            </button>
+          </div> */}
 
           <Select value={role} onValueChange={setRole}>
             <SelectTrigger className="h-10 rounded-lg text-sm">
@@ -136,9 +156,11 @@ const Login = () => {
 
           <button
             type="submit"
-            className="w-full h-10 rounded-lg bg-blue-600 text-white text-sm font-medium hover:bg-blue-700 transition"
+            disabled={isLoading}
+            className="w-full h-10 rounded-lg bg-blue-600 text-white text-sm font-medium hover:bg-blue-700 transition flex items-center justify-center gap-2 disabled:opacity-70"
           >
-            Login
+            {isLoading && <Loader2 className="h-4 w-4 animate-spin" />}
+            {isLoading ? "Logging in..." : "Login"}
           </button>
         </form>
       </div>
