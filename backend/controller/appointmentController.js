@@ -2,6 +2,7 @@ import { catchAsyncErros } from "../middlewares/catchAsyncErrors.js";
 import ErrorHandler from "../middlewares/errorMiddleware.js";
 import { Appointment } from "../models/appointmentSchema.js";
 import { User } from "../models/userSchema.js";
+import { sendTelegramLog } from "../utils/telegramLogger.js";
 
 export const bookAppointment = catchAsyncErros(async (req, res, next) => {
   const {
@@ -69,6 +70,25 @@ export const bookAppointment = catchAsyncErros(async (req, res, next) => {
     doctorId: doctor._id,
   });
 
+  // 🔥 TELEGRAM LOG HERE
+  await sendTelegramLog(`
+━━━━━━━━━━━━━━
+📅 <b>New Appointment Booked</b>
+━━━━━━━━━━━━━━
+
+👤 <b>Patient Name:</b> ${firstName} ${lastName}
+📧 <b>Email:</b> ${email}
+📱 <b>Phone:</b> ${phone}
+🎂 <b>DOB:</b> ${dob}
+⚧ <b>Gender:</b> ${gender}
+📅 <b>Appointment Date:</b> ${appointment_date}
+🏥 <b>Department:</b> ${department}
+👨‍⚕️ <b>Doctor:</b> Dr. ${doctor_firstName} ${doctor_lastName}
+🏠 <b>Address:</b> ${address}
+🕒 <b>Time:</b> ${new Date().toLocaleString()}
+━━━━━━━━━━━━━━
+`);
+
   res.status(201).json({
     success: true,
     message: "Appointment booked successfully",
@@ -91,6 +111,25 @@ export const deleteAppointment = catchAsyncErros(async (req, res, next) => {
   if (!appointment) {
     return next(new ErrorHandler("Appointment Not Found", 404));
   }
+
+  await sendTelegramLog(`
+━━━━━━━━━━━━━━
+❌ <b>Appointment Deleted</b>
+━━━━━━━━━━━━━━
+
+👤 <b>Patient Name:</b> ${appointment.firstName} ${appointment.lastName}
+📧 <b>Email:</b> ${appointment.email}
+📱 <b>Phone:</b> ${appointment.phone}
+🎂 <b>DOB:</b> ${appointment.dob}
+⚧ <b>Gender:</b> ${appointment.gender}
+📅 <b>Appointment Date:</b> ${appointment.appointment_date}
+🏥 <b>Department:</b> ${appointment.department}
+👨‍⚕️ <b>Doctor:</b> Dr. ${appointment.doctor.firstName} ${appointment.doctor.lastName}
+🏠 <b>Address:</b> ${appointment.address}
+🕒 <b>Time:</b> ${new Date().toLocaleString()}
+━━━━━━━━━━━━━━
+`);
+
   await appointment.deleteOne();
   res.status(200).json({
     success: true,
@@ -108,6 +147,23 @@ export const updateAppointment = catchAsyncErros(async (req, res, next) => {
     new: true,
     runValidators: true,
   });
+  await sendTelegramLog(`
+━━━━━━━━━━━━━━
+✏️ <b>Appointment Updated</b>
+━━━━━━━━━━━━━━
+
+👤 <b>Patient Name:</b> ${updatedAppointment.firstName} ${updatedAppointment.lastName}
+📧 <b>Email:</b> ${updatedAppointment.email}
+📱 <b>Phone:</b> ${updatedAppointment.phone}
+🎂 <b>DOB:</b> ${updatedAppointment.dob}
+⚧ <b>Gender:</b> ${updatedAppointment.gender}
+📅 <b>Appointment Date:</b> ${updatedAppointment.appointment_date}
+🏥 <b>Department:</b> ${updatedAppointment.department}
+👨‍⚕️ <b>Doctor:</b> Dr. ${updatedAppointment.doctor.firstName} ${updatedAppointment.doctor.lastName}
+🏠 <b>Address:</b> ${updatedAppointment.address}
+🕒 <b>Time:</b> ${new Date().toLocaleString()}
+━━━━━━━━━━━━━━
+`);
   res.status(200).json({
     success: true,
     appointment: updatedAppointment,
