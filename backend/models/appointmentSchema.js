@@ -43,6 +43,10 @@ const appointmentSchema = new mongoose.Schema(
       type: String,
       required: true,
     },
+    timeSlot: {
+      type: String,
+      required: false, // keep false so old data doesn't break
+    },
     department: {
       type: String,
       required: true,

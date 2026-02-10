@@ -13,6 +13,7 @@ import Navbar from "./components/Navbar";
 import { Context } from "./main";
 import axios from "axios";
 import Footer from "./components/Footer";
+import { Toaster } from "sonner";
 
 function App() {
   const { isAuthenticated, setIsAuthenticated, setUser } = useContext(Context);
@@ -46,6 +47,7 @@ function App() {
         </Routes>
         <Footer />
         <ToastContainer position="top-center" />
+        <Toaster position="top-center" />
       </Router>
     </>
   );

@@ -114,6 +114,40 @@ const Appointments = () => {
     }
   };
 
+  const handleDelete = (id) => {
+    if (role !== "admin") return;
+
+    toast("Delete this appointment?", {
+      position: "top-right",
+      description: "This action cannot be undone.",
+      action: {
+        label: "Delete",
+        onClick: async () => {
+          try {
+            await axios.delete(`${baseURL}/api/v1/appointment/delete/${id}`, {
+              withCredentials: true,
+            });
+
+            setAppointments((prev) => prev.filter((a) => a._id !== id));
+
+            toast.success("Appointment deleted successfully 🗑️", {
+              position: "top-right",
+            });
+          } catch (error) {
+            toast.error(
+              error.response?.data?.message || "Failed to delete appointment",
+              { position: "top-right" },
+            );
+          }
+        },
+      },
+      cancel: {
+        label: "Cancel",
+        onClick: () => {},
+      },
+    });
+  };
+
   /* ================= STATUS BADGE ================= */
   const statusBadge = (status) => {
     switch (status) {
@@ -187,6 +221,7 @@ const Appointments = () => {
               {role === "admin" && <TableHead>Doctor</TableHead>}
               <TableHead>Department</TableHead>
               <TableHead>Date</TableHead>
+              <TableHead>Time Slot</TableHead>
               <TableHead>Status</TableHead>
               <TableHead className="text-center">Visited</TableHead>
               {role === "admin" && (
@@ -234,6 +269,8 @@ const Appointments = () => {
                   <TableCell>
                     {new Date(a.appointment_date).toLocaleDateString()}
                   </TableCell>
+                  {/* <TableCell>{a.timeSlot}</TableCell> */}
+                  <TableCell>{a.timeSlot || "Not Available"}</TableCell>
 
                   <TableCell>{statusBadge(a.status)}</TableCell>
 
@@ -246,7 +283,7 @@ const Appointments = () => {
                   </TableCell>
 
                   {role === "admin" && (
-                    <TableCell className="text-right">
+                    <TableCell className="text-right flex items-center justify-end gap-2">
                       <Select
                         value={a.status}
                         onValueChange={(value) =>
@@ -264,6 +301,14 @@ const Appointments = () => {
                           <SelectItem value="Completed">Completed</SelectItem>
                         </SelectContent>
                       </Select>
+
+                      {/* Delete Button */}
+                      <button
+                        onClick={() => handleDelete(a._id)}
+                        className="px-3 py-2 text-sm bg-red-500 hover:bg-red-600 text-white rounded-lg transition"
+                      >
+                        Delete
+                      </button>
                     </TableCell>
                   )}
                 </TableRow>

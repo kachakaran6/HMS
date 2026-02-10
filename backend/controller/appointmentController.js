@@ -18,6 +18,7 @@ export const bookAppointment = catchAsyncErros(async (req, res, next) => {
     doctor_lastName,
     hasVisited,
     address,
+    timeSlot,
   } = req.body;
 
   if (
@@ -30,6 +31,7 @@ export const bookAppointment = catchAsyncErros(async (req, res, next) => {
     !appointment_date ||
     !department ||
     !doctor_firstName ||
+    !timeSlot ||
     !doctor_lastName ||
     !address
   ) {
@@ -40,6 +42,7 @@ export const bookAppointment = catchAsyncErros(async (req, res, next) => {
     return next(new ErrorHandler("Unauthorized", 401));
   }
 
+  // 🔎 Find doctor
   const doctor = await User.findOne({
     firstName: doctor_firstName,
     lastName: doctor_lastName,
@@ -49,6 +52,20 @@ export const bookAppointment = catchAsyncErros(async (req, res, next) => {
 
   if (!doctor) {
     return next(new ErrorHandler("Doctor not found", 404));
+  }
+
+  // 🚫 CHECK SLOT ALREADY BOOKED
+  const existingAppointment = await Appointment.findOne({
+    doctorId: doctor._id,
+    appointment_date,
+    timeSlot,
+    status: { $ne: "Cancelled" }, // ignore cancelled
+  });
+
+  if (existingAppointment) {
+    return next(
+      new ErrorHandler("This slot is already booked for this doctor", 400),
+    );
   }
 
   const appointment = await Appointment.create({
@@ -61,16 +78,16 @@ export const bookAppointment = catchAsyncErros(async (req, res, next) => {
     appointment_date,
     department,
     doctor: {
-      firstName: doctor_firstName, // must match schema
+      firstName: doctor_firstName,
       lastName: doctor_lastName,
     },
-    hasVisited,
+    has_visited: hasVisited ?? false, // ✅ map correctly
     address,
-    patientId: req.user._id, // ✅ ObjectId
+    timeSlot,
+    patientId: req.user._id,
     doctorId: doctor._id,
   });
 
-  // 🔥 TELEGRAM LOG HERE
   await sendTelegramLog(`
 ━━━━━━━━━━━━━━
 📅 <b>New Appointment Booked</b>
@@ -85,6 +102,7 @@ export const bookAppointment = catchAsyncErros(async (req, res, next) => {
 🏥 <b>Department:</b> ${department}
 👨‍⚕️ <b>Doctor:</b> Dr. ${doctor_firstName} ${doctor_lastName}
 🏠 <b>Address:</b> ${address}
+🕒 <b>Time Slot:</b> ${timeSlot}
 🕒 <b>Time:</b> ${new Date().toLocaleString()}
 ━━━━━━━━━━━━━━
 `);
@@ -167,5 +185,28 @@ export const updateAppointment = catchAsyncErros(async (req, res, next) => {
   res.status(200).json({
     success: true,
     appointment: updatedAppointment,
+  });
+});
+
+export const getDoctorAvailability = catchAsyncErros(async (req, res, next) => {
+  const { doctorId, date } = req.query;
+
+  if (!doctorId || !date) {
+    return next(new ErrorHandler("Doctor ID and date are required", 400));
+  }
+
+  // 🔎 Find all non-cancelled appointments for that doctor & date
+  const appointments = await Appointment.find({
+    doctorId,
+    appointment_date: date, // match your schema
+    status: { $ne: "Cancelled" },
+  });
+
+  // Extract booked time slots (ignore undefined for old records)
+  const bookedSlots = appointments.map((a) => a.timeSlot).filter(Boolean);
+
+  res.status(200).json({
+    success: true,
+    bookedSlots,
   });
 });
