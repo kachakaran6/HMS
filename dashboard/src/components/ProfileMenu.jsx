@@ -2,7 +2,7 @@ import { useState, useContext, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { Context } from "../main";
 import axios from "axios";
-import { toast } from "react-toastify";
+import { toast } from "sonner";
 
 const ProfileMenu = () => {
   const [open, setOpen] = useState(false);
@@ -42,11 +42,11 @@ const ProfileMenu = () => {
         {},
         { withCredentials: true },
       );
-      toast.success(data.message);
+      toast.success(data.message, { position: "top-right" });
       setIsAuthenticated(false);
       navigate("/login");
     } catch {
-      toast.error("Logout failed");
+      toast.error("Logout failed", { position: "top-right" });
     }
   };
 

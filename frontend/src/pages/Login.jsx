@@ -1,7 +1,7 @@
 import React, { useContext, useEffect, useState } from "react";
 import { Context } from "../main";
 import { Link, useNavigate } from "react-router-dom";
-import { toast } from "react-toastify";
+import { toast } from "sonner";
 import axios from "axios";
 
 const Login = () => {
@@ -31,11 +31,13 @@ const Login = () => {
         },
       );
 
-      toast.success(data.message);
+      toast.success(data.message, { position: "top-right" });
       setIsAuthenticated(true);
       navigateTo("/");
     } catch (error) {
-      toast.error(error.response?.data?.message || "Login failed");
+      toast.error(error.response?.data?.message || "Login failed", {
+        position: "top-right",
+      });
     }
   };
 

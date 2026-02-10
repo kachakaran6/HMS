@@ -2,7 +2,7 @@ import React, { useContext, useState } from "react";
 import { Context } from "../main";
 import { Link, Navigate, useNavigate } from "react-router-dom";
 import axios from "axios";
-import { toast } from "react-toastify";
+import { toast } from "sonner";
 
 const Register = () => {
   const { isAuthenticated } = useContext(Context);
@@ -41,10 +41,14 @@ const Register = () => {
         },
       );
 
-      toast.success(data.message || "Registered successfully");
+      toast.success(data.message || "Registered successfully", {
+        position: "top-right",
+      });
       navigateTo("/login");
     } catch (error) {
-      toast.error(error?.response?.data?.message || "Registration failed");
+      toast.error(error?.response?.data?.message || "Registration failed", {
+        position: "top-right",
+      });
     }
   };
 

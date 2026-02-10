@@ -1,7 +1,7 @@
 import React, { useContext, useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { Context } from "../main";
-import { toast } from "react-toastify";
+import { toast } from "sonner";
 import axios from "axios";
 import { GiHamburgerMenu } from "react-icons/gi";
 
@@ -18,10 +18,10 @@ const Navbar = () => {
         {},
         { withCredentials: true },
       );
-      toast.success(res.data.message);
+      toast.success(res.data.message, { position: "top-right" });
       setIsAuthenticated(false);
     } catch (error) {
-      toast.error("Error logging out", error);
+      toast.error("Error logging out", error, { position: "top-right" });
     }
   };
 

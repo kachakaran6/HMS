@@ -1,6 +1,6 @@
 import { useState } from "react";
 import axios from "axios";
-import { toast } from "react-toastify";
+import { toast } from "sonner";
 
 const MessageForm = () => {
   const [firstName, setFirstName] = useState("");
@@ -23,14 +23,16 @@ const MessageForm = () => {
         },
       );
 
-      toast.success(data.message);
+      toast.success(data.message, { position: "top-right" });
       setFirstName("");
       setLastName("");
       setEmail("");
       setPhone("");
       setMessage("");
     } catch (err) {
-      toast.error("Failed to send message", err.message);
+      toast.error("Failed to send message", err.message, {
+        position: "top-right",
+      });
     }
   };
 
