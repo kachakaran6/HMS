@@ -176,6 +176,7 @@ export const updateAppointment = catchAsyncErros(async (req, res, next) => {
 🎂 <b>DOB:</b> ${updatedAppointment.dob}
 ⚧ <b>Gender:</b> ${updatedAppointment.gender}
 📅 <b>Appointment Date:</b> ${updatedAppointment.appointment_date}
+📝 <b>Status:</b> ${updatedAppointment.status}
 🏥 <b>Department:</b> ${updatedAppointment.department}
 👨‍⚕️ <b>Doctor:</b> Dr. ${updatedAppointment.doctor.firstName} ${updatedAppointment.doctor.lastName}
 🏠 <b>Address:</b> ${updatedAppointment.address}
