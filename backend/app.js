@@ -24,6 +24,8 @@ app.use(
       process.env.DASHBOARD_URL,
       "https://hms-core.vercel.app",
       "https://hms-core-dashboard.vercel.app",
+      "http://localhost:8081",
+      "http://localhost:19006",
     ],
     methods: ["GET", "POST", "PUT", "DELETE", "OPTIONS"],
     credentials: true,
