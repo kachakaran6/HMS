@@ -13,11 +13,9 @@ export const generateToken = (user, message, statusCode, res) => {
     .status(statusCode)
     .cookie(cookieName, token, {
       httpOnly: true,
-
       // ✅ REQUIRED FOR LIVE (Vercel + Render)
       secure: true, // HTTPS only
       sameSite: "None", // cross-site cookie
-
       expires: new Date(
         Date.now() + process.env.COOKIE_EXPIRE * 24 * 60 * 60 * 1000,
       ),
@@ -25,6 +23,7 @@ export const generateToken = (user, message, statusCode, res) => {
     .json({
       success: true,
       message,
+      token,
       user,
     });
 };
