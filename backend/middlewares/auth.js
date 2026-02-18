@@ -23,25 +23,33 @@ export const isAdminAuthenticated = catchAsyncErros(async (req, res, next) => {
 
 export const isPatientAuthenticated = catchAsyncErros(
   async (req, res, next) => {
-    const token = req.cookies.user_token;
-    if (!token) {
-      return next(new ErrorHandler("patient not authenticated", 401));
-    }
-    const decoded = jwt.verify(token, process.env.JWT_SECRET_KEY);
-    req.user = await User.findById(decoded.id);
+    let token;
+
+    // 1️⃣ Check Authorization header (Mobile)
     if (
-      req.user.role !== "user" &&
-      req.user.role !== "patient" &&
-      req.user.role !== "doctor" &&
-      req.user.role !== "staff"
+      req.headers.authorization &&
+      req.headers.authorization.startsWith("Bearer ")
     ) {
-      return next(
-        new ErrorHandler(
-          `Access denied ${req.user.role}, not a patient, pehli fursat me nikal yaha se`,
-          403,
-        ),
-      );
+      token = req.headers.authorization.split(" ")[1];
     }
+
+    // 2️⃣ Fallback to cookies (Web)
+    if (!token && req.cookies.user_token) {
+      token = req.cookies.user_token;
+    }
+
+    if (!token) {
+      return next(new ErrorHandler("Patient not authenticated", 401));
+    }
+
+    const decoded = jwt.verify(token, process.env.JWT_SECRET_KEY);
+
+    req.user = await User.findById(decoded.id);
+
+    if (!req.user) {
+      return next(new ErrorHandler("User not found", 401));
+    }
+
     next();
   },
 );
