@@ -125,7 +125,7 @@ router.get("/allDoc", getDoctors);
  */
 router.post("/admin/addnew", isAdminAuthenticated, addNewAdmin);
 
-router.get("/patient/me", isPatientAuthenticated, getUsers);
+// router.get("/patient/me", isPatientAuthenticated, getUsers);
 
 /**
  * @swagger
