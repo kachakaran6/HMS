@@ -38,6 +38,24 @@ const AddNewDoctor = () => {
   const [timeLeft, setTimeLeft] = useState(OTP_DURATION);
   const [canResend, setCanResend] = useState(false);
 
+  const generatePatientId = () => {
+    const now = new Date();
+
+    const dd = String(now.getDate()).padStart(2, "0");
+    const mm = String(now.getMonth() + 1).padStart(2, "0");
+    const yyyy = now.getFullYear();
+    const hh = String(now.getHours()).padStart(2, "0");
+    const min = String(now.getMinutes()).padStart(2, "0");
+
+    const random = Math.floor(100 + Math.random() * 900); // 3 digit random
+
+    return `${dd}${mm}${yyyy}${hh}${min}${random}`;
+  };
+
+  useEffect(() => {
+    setPatientId(generatePatientId());
+  }, []);
+
   useEffect(() => {
     if (!showOtpBox) return;
 
@@ -276,7 +294,7 @@ const AddNewDoctor = () => {
 
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
               <div>
-                <label className="text-sm text-slate-700">Patient ID</label>
+                <label className="text-sm text-slate-700">Doctor ID</label>
                 <input
                   type="text"
                   className="mt-1 w-full h-11 rounded-lg border border-slate-300 px-3 focus:border-blue-600 focus:outline-none"
