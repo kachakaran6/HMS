@@ -16,28 +16,27 @@ const Login = () => {
 
   const handleLogin = async (e) => {
     e.preventDefault();
+
     try {
       const { data } = await axios.post(
         `${baseURL}/api/v1/user/login`,
-        {
-          email,
-          password,
-          confirmPassword,
-          role: "patient",
-        },
+        { email, password, confirmPassword, role: "patient" },
         {
           withCredentials: true,
           headers: { "Content-Type": "application/json" },
         },
       );
 
-      toast.success(data.message, { position: "top-right" });
+      // 🔥 ensure cookie ready (very important)
+      await axios.get(`${baseURL}/api/v1/user/patient/me?ts=${Date.now()}`, {
+        withCredentials: true,
+      });
+
+      toast.success(data.message);
       setIsAuthenticated(true);
       navigateTo("/");
     } catch (error) {
-      toast.error(error.response?.data?.message || "Login failed", {
-        position: "top-right",
-      });
+      toast.error(error.response?.data?.message || "Login failed");
     }
   };
 

@@ -1,4 +1,5 @@
-import React, { useContext, useState } from "react";
+/* eslint-disable react-hooks/set-state-in-effect */
+import React, { useContext, useState, useEffect } from "react";
 import { Context } from "../main";
 import { Link, Navigate, useNavigate } from "react-router-dom";
 import axios from "axios";
@@ -15,6 +16,24 @@ const Register = () => {
   const [dob, setDob] = useState("");
   const [gender, setGender] = useState("");
   const [password, setPassword] = useState("");
+
+  const generatePatientId = () => {
+    const now = new Date();
+
+    const dd = String(now.getDate()).padStart(2, "0");
+    const mm = String(now.getMonth() + 1).padStart(2, "0");
+    const yyyy = now.getFullYear();
+    const hh = String(now.getHours()).padStart(2, "0");
+    const min = String(now.getMinutes()).padStart(2, "0");
+
+    const random = Math.floor(100 + Math.random() * 900); // 3 digit random
+
+    return `${dd}${mm}${yyyy}${hh}${min}${random}`;
+  };
+
+  useEffect(() => {
+    setPatientId(generatePatientId());
+  }, []);
 
   const baseURL = import.meta.env.VITE_API_BASE_URL;
   const navigateTo = useNavigate();
@@ -113,6 +132,8 @@ const Register = () => {
               className="input"
               value={patientId}
               onChange={(e) => setPatientId(e.target.value)}
+              disabled
+              hidden
             />
             <input
               type="date"

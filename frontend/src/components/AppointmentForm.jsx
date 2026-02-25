@@ -52,6 +52,12 @@ export default function AppointmentForm() {
     timeSlot: "",
     address: "",
     hasVisited: false,
+
+    // ⭐ add these
+    dob: "",
+    gender: "",
+    doctor_firstName: "",
+    doctor_lastName: "",
   });
 
   const [doctors, setDoctors] = useState([]);
@@ -67,6 +73,36 @@ export default function AppointmentForm() {
       setDoctors(data.users || []);
     };
     fetchDoctors();
+  }, [baseurl]);
+
+  // Fetch logged in patient info (auto fill)
+  useEffect(() => {
+    const fetchPatient = async () => {
+      try {
+        const { data } = await axios.get(
+          `${baseurl}/api/v1/user/patient/me?ts=${Date.now()}`,
+          { withCredentials: true },
+        );
+
+        const user = data.user;
+
+        setForm((prev) => ({
+          ...prev,
+          firstName: user.firstName || "",
+          lastName: user.lastName || "",
+          email: user.email || "",
+          phone: user.phone || "",
+          dob: user.dob ? user.dob.split("T")[0] : "",
+          gender: user.gender || "",
+          address: user.address || "",
+          hasVisited: user.hasVisited || false,
+        }));
+      } catch (err) {
+        console.log("Patient fetch error", err);
+      }
+    };
+
+    fetchPatient();
   }, [baseurl]);
 
   // Fetch availability
@@ -209,6 +245,7 @@ export default function AppointmentForm() {
                 />
 
                 <Select
+                  value={form.gender}
                   onValueChange={(val) => setForm({ ...form, gender: val })}
                 >
                   <SelectTrigger>
