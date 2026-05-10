@@ -1,0 +1,33 @@
+PORT=3000
+
+MONGO_URI=mongodb+srv://kachak331_db_user:qLL5vGYsUOuPH4C4@cluster0.6fuzlqf.mongodb.net/?retryWrites=true
+
+FRONTEND_URL= http://localhost:5173
+
+DASHBOARD_URL= http://localhost:5174
+
+JWT_SECRET_KEY=karanhmssecretkey123456
+
+JWT_EXPIRES=7d
+
+COOKIE_EXPIRE=7
+
+CLOUDINARY_CLOUD_NAME=dcjfz7e1h
+
+CLOUDINARY_API_SECRET=pzzi30Q3WSOk3fl-KAQnAWMYL8I
+
+CLOUDINARY_API_KEY=921785225253576
+
+Pass = qLL5vGYsUOuPH4C4
+
+uname =  kachak331_db_user
+TG_BOT_TOKEN=7677054599:AAGUU_7KC_UPzY5TDJfMeXmVzL4jg_w_jOw
+TG_CHAT_ID=-1003805623578
+
+
+# BREVO_EMAIL=no-reply@kachakaran.me
+# BREVO_SMTP_KEY=xsmtpsib-2ae803cfa6518b272ae01d74040acf0862957944065601f3e7ac51d48094d6a7-o7c7ce93XlYQpzBx
+
+VITE_API_BASE_URL=http://localhost:3000
+
+VITE_API_BASE_URL=http://localhost:3000
